@@ -54,7 +54,7 @@ app.include_router(multi_upload_router, prefix="/api")
 
 @app.get("/")
 async def serve_frontend():
-    return FileResponse("../frontend/index.html")
+    return FileResponse("../frontend/login.html")
 
 @app.get("/upload")
 async def serve_upload():
@@ -86,11 +86,15 @@ async def serve_multi_upload_direct():
 
 @app.get("/login")
 async def serve_login():
-    return FileResponse("../frontend/simple_login.html")
-
-@app.get("/frontend/login.html")
-async def serve_login_direct():
     return FileResponse("../frontend/login.html")
+
+@app.get("/dashboard-government")
+async def serve_government_dashboard():
+    return FileResponse("../frontend/dashboard-government.html")
+
+@app.get("/dashboard-college")
+async def serve_college_dashboard():
+    return FileResponse("../frontend/dashboard-college.html")
 
 @app.get("/student/{student_id}")
 async def serve_student():
