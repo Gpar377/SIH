@@ -8,7 +8,7 @@ import os
 from typing import Dict, List, Optional
 from pydantic import BaseModel
 
-from models.database import Database
+from models.multi_tenant_db import MultiTenantDatabase
 from models.ml_models import DropoutPredictor
 from models.risk_engine import RiskEngine
 from utils.file_processor import FileProcessor
@@ -16,8 +16,13 @@ from api.upload import upload_router
 from api.students import students_router
 from api.dashboard import dashboard_router
 from api.multi_upload import multi_upload_router
+from api.auth_routes import router as auth_router
 
-app = FastAPI(title="DTE Rajasthan Dropout Prediction System", version="1.0.0")
+app = FastAPI(
+    title="DTE Rajasthan Multi-Tenant Dropout Prediction System", 
+    version="2.0.0",
+    description="Secure multi-tenant system with role-based access control"
+)
 
 # CORS middleware
 app.add_middleware(
@@ -29,7 +34,7 @@ app.add_middleware(
 )
 
 # Initialize components
-db = Database()
+multi_db = MultiTenantDatabase()
 ml_predictor = DropoutPredictor()
 risk_engine = RiskEngine()
 file_processor = FileProcessor()
@@ -41,6 +46,7 @@ app.mount("/js", StaticFiles(directory="../frontend/js"), name="js")
 app.mount("/frontend", StaticFiles(directory="../frontend"), name="frontend")
 
 # Include routers
+app.include_router(auth_router, prefix="/auth", tags=["authentication"])
 app.include_router(upload_router, prefix="/api")
 app.include_router(students_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
@@ -92,7 +98,12 @@ async def serve_student():
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "message": "DTE Rajasthan System Running"}
+    return {
+        "status": "healthy", 
+        "message": "DTE Rajasthan Multi-Tenant System Running",
+        "version": "2.0.0",
+        "features": ["multi-tenancy", "role-based-access", "audit-logging"]
+    }
 
 @app.get("/test")
 async def serve_test():

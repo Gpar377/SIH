@@ -1,14 +1,15 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
 from typing import Dict, List, Optional
 
-from models.database import Database
+from models.multi_tenant_db import MultiTenantDatabase
 from models.risk_engine import RiskEngine
+from auth.auth import User, UserRole, get_current_user, require_role
 
 students_router = APIRouter()
 
 # Global instances
-db = Database()
+multi_db = MultiTenantDatabase()
 risk_engine = RiskEngine()
 
 class StudentUpdate(BaseModel):
@@ -27,46 +28,69 @@ async def get_students(
     offset: int = Query(0, ge=0),
     department: Optional[str] = None,
     risk_level: Optional[str] = None,
-    institution_type: Optional[str] = None,
-    college_filter: Optional[str] = None
+    current_user: User = Depends(get_current_user)
 ):
-    """Get students with pagination and filters"""
+    """Get students with pagination and filters (role-based access)"""
     try:
-        filters = {}
-        if department:
-            filters['department'] = department
-        if risk_level:
-            filters['risk_level'] = risk_level
-        if institution_type:
-            filters['institution_type'] = institution_type
-        if college_filter:
-            filters['college_filter'] = college_filter
+        # Log access attempt
+        multi_db.log_user_action(current_user, "VIEW_STUDENTS", "students_list")
         
-        if filters:
-            students = db.get_students_by_filter(filters, limit, offset)
-        else:
-            students = db.get_all_students(limit, offset, college_filter)
-            
-        print(f"Found {len(students)} students for college: {college_filter or 'main'}")
+        # Get students based on user role and permissions
+        students = multi_db.get_students_for_user(current_user, limit, offset)
+        
+        # Apply additional filters if provided
+        if department:
+            students = [s for s in students if s.get('department') == department]
+        if risk_level:
+            students = [s for s in students if s.get('risk_level') == risk_level]
         
         return {
             "students": students,
             "total": len(students),
             "limit": limit,
-            "offset": offset
+            "offset": offset,
+            "user_role": current_user.role.value,
+            "college_id": current_user.college_id
         }
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 @students_router.get("/student/{student_id}")
-async def get_student(student_id: str):
-    """Get individual student details with risk breakdown"""
+async def get_student(
+    student_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Get individual student details with risk breakdown (access controlled)"""
     try:
-        student = db.get_student_by_id(student_id)
+        # Check access permissions
+        if current_user.role != UserRole.GOVERNMENT_ADMIN:
+            # College users can only access their own students
+            db_path = multi_db.get_college_database_path(current_user.college_id)
+            import sqlite3
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT college_id FROM students WHERE student_id = ?", (student_id,))
+                result = cursor.fetchone()
+                if not result or result[0] != current_user.college_id:
+                    raise HTTPException(status_code=403, detail="Access denied to this student")
         
-        if not student:
-            raise HTTPException(status_code=404, detail="Student not found")
+        # Log access
+        multi_db.log_user_action(current_user, "VIEW_STUDENT", f"student_{student_id}")
+        
+        # Get student from appropriate database
+        db_path = multi_db.get_database_for_user(current_user)
+        import sqlite3
+        import pandas as pd
+        
+        with sqlite3.connect(db_path) as conn:
+            query = "SELECT * FROM students WHERE student_id = ?"
+            df = pd.read_sql_query(query, conn, params=(student_id,))
+            
+            if len(df) == 0:
+                raise HTTPException(status_code=404, detail="Student not found")
+            
+            student = df.iloc[0].to_dict()
         
         # Calculate detailed risk breakdown
         risk_breakdown = risk_engine.calculate_risk_score(student)

@@ -94,17 +94,17 @@ class FileProcessor:
         # Validate data types and ranges
         if 'attendance_percentage' in df.columns:
             invalid_attendance = df[(df['attendance_percentage'] < 0) | (df['attendance_percentage'] > 100)]
-            if len(invalid_attendance) > 0:
+            if not invalid_attendance.empty:
                 validation_results['warnings'].append(f"{len(invalid_attendance)} rows have invalid attendance values")
         
         if 'marks' in df.columns:
             invalid_marks = df[(df['marks'] < 0) | (df['marks'] > 100)]
-            if len(invalid_marks) > 0:
+            if not invalid_marks.empty:
                 validation_results['warnings'].append(f"{len(invalid_marks)} rows have invalid marks")
         
         if 'family_income' in df.columns:
             negative_income = df[df['family_income'] < 0]
-            if len(negative_income) > 0:
+            if not negative_income.empty:
                 validation_results['warnings'].append(f"{len(negative_income)} rows have negative family income")
         
         # Generate statistics
