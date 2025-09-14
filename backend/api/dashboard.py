@@ -56,19 +56,13 @@ async def get_dashboard_stats(current_user: User = Depends(get_current_user)):
         raise HTTPException(status_code=500, detail="Internal server error")
 
 @dashboard_router.get("/dashboard/alerts")
-async def get_active_alerts(college_filter: str = None):
+async def get_active_alerts(current_user: User = Depends(get_current_user)):
     """Get students requiring immediate attention"""
     try:
-        # Get critical and high-risk students
-        filters = {'risk_level': 'Critical'}
-        if college_filter:
-            filters['college_filter'] = college_filter
-        critical_students = db.get_students_by_filter(filters)
-        
-        filters = {'risk_level': 'High'}
-        if college_filter:
-            filters['college_filter'] = college_filter
-        high_risk_students = db.get_students_by_filter(filters)
+        # Get all students for user and filter by risk level
+        all_students = multi_db.get_students_for_user(current_user, 1000)
+        critical_students = [s for s in all_students if s.get('risk_level') == 'Critical']
+        high_risk_students = [s for s in all_students if s.get('risk_level') == 'High']
         
         # Format alerts using list comprehension (PEP8 compliant)
         alerts = [
@@ -113,14 +107,12 @@ async def get_active_alerts(college_filter: str = None):
         raise HTTPException(status_code=500, detail="Failed to retrieve alerts")
 
 @dashboard_router.get("/dashboard/trends")
-async def get_risk_trends():
+async def get_risk_trends(current_user: User = Depends(get_current_user)):
     """Get risk trends and patterns"""
     try:
-        # This is a simplified version - in a real system you'd track historical data
-        stats = db.get_dashboard_stats()
-        
-        # Department-wise risk analysis - fetch all students once
-        all_students = db.get_students_by_filter({})
+        # Get stats and students based on user permissions
+        stats = multi_db.get_dashboard_stats_for_user(current_user)
+        all_students = multi_db.get_students_for_user(current_user, 10000)
         department_risk = {}
         for dept in stats['department_distribution'].keys():
             dept_students = [s for s in all_students if s.get('department') == dept]
@@ -150,10 +142,10 @@ async def get_risk_trends():
         raise HTTPException(status_code=500, detail="Failed to calculate trends")
 
 @dashboard_router.get("/dashboard/recommendations")
-async def get_system_recommendations():
+async def get_system_recommendations(current_user: User = Depends(get_current_user)):
     """Get system-wide recommendations"""
     try:
-        stats = db.get_dashboard_stats()
+        stats = multi_db.get_dashboard_stats_for_user(current_user)
         recommendations = []
         
         # Analyze risk distribution and generate recommendations
@@ -175,7 +167,7 @@ async def get_system_recommendations():
             })
         
         # Department-specific recommendations - fetch all students once
-        all_students = db.get_students_by_filter({})
+        all_students = multi_db.get_students_for_user(current_user, 10000)
         dept_dist = stats['department_distribution']
         for dept, count in dept_dist.items():
             if count > 0:

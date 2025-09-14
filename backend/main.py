@@ -24,13 +24,18 @@ app = FastAPI(
     description="Secure multi-tenant system with role-based access control"
 )
 
-# CORS middleware
+# CORS middleware with specific origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:8010",
+        "http://127.0.0.1:8010",
+        "https://dte-rajasthan.gov.in",  # Production domain
+        "https://*.dte-rajasthan.gov.in"  # Subdomains
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 # Initialize components
@@ -106,7 +111,8 @@ async def health_check():
         "status": "healthy", 
         "message": "DTE Rajasthan Multi-Tenant System Running",
         "version": "2.0.0",
-        "features": ["multi-tenancy", "role-based-access", "audit-logging"]
+        "features": ["multi-tenancy", "role-based-access", "audit-logging"],
+        "security": ["jwt-auth", "cors-protection", "data-isolation"]
     }
 
 @app.get("/test")

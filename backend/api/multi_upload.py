@@ -1,15 +1,16 @@
-from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form, Depends
 from typing import List, Dict, Optional
 import pandas as pd
 import io
 import sqlite3
-from models.database import Database
+from models.multi_tenant_db import MultiTenantDatabase
 from models.risk_engine import RiskEngine
+from auth.auth import User, get_current_user
 
 multi_upload_router = APIRouter()
 
 # Global instances
-db = Database()
+multi_db = MultiTenantDatabase()
 risk_engine = RiskEngine()
 
 @multi_upload_router.post("/multi-upload")
@@ -17,7 +18,7 @@ async def process_multi_files(
     attendance_file: Optional[UploadFile] = File(None),
     marks_file: Optional[UploadFile] = File(None),
     fees_file: Optional[UploadFile] = File(None),
-    session_id: str = Form(...)
+    current_user: User = Depends(get_current_user)
 ):
     """Process multiple files and merge student data"""
     try:
@@ -49,11 +50,11 @@ async def process_multi_files(
         # Calculate multi-area risks
         risk_analysis = calculate_multi_area_risks(merged_data)
         
-        # Determine college from session or user context
-        college_code = determine_college_from_session(session_id)
+        # Use college from authenticated user
+        college_code = current_user.college_id
         
         # Store in college-specific database
-        stored_count = store_merged_data(merged_data, session_id, college_code)
+        stored_count = store_merged_data(merged_data, college_code)
         
         return {
             "success": True,
@@ -68,7 +69,7 @@ async def process_multi_files(
             },
             "risk_analysis": risk_analysis,
             "stored_count": stored_count,
-            "session_id": session_id
+            "college_id": college_code
         }
         
     except Exception as e:
