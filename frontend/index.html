@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTE Rajasthan - Student Risk Management System</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/charts.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="logo" style="width:40px;height:40px;background:#1e40af;color:white;display:flex;align-items:center;justify-content:center;border-radius:4px;font-weight:bold;">DTE</div>
+                <h1>DTE Rajasthan - Student Risk Management</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn-icon" id="notifications-btn">
+                    <span class="notification-badge">5</span>
+                    🔔
+                </button>
+                <button class="btn-icon">⚙️</button>
+                <div class="user-profile">
+                    <span id="user-display">Loading...</span>
+                    <button class="btn-primary" onclick="window.location.href='/login'">Login</button>
+                    <button class="btn-secondary" onclick="logout()" style="display:none" id="logout-btn">Logout</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="sidebar">
+        <ul class="nav-menu">
+            <li><a href="#dashboard" class="nav-link active">📊 Dashboard</a></li>
+            <li><a href="/upload" class="nav-link">📤 Upload Data</a></li>
+            <li><a href="/frontend/students.html" class="nav-link">👥 Students</a></li>
+            <li><a href="/alerts" class="nav-link">🚨 Alerts</a></li>
+            <li><a href="#reports" class="nav-link">📋 Reports</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Dashboard Section -->
+        <section id="dashboard-section" class="content-section active">
+            <div class="page-header">
+                <h2>Dashboard Overview</h2>
+                <div class="header-actions">
+                    <select id="college-selector" class="college-selector" onchange="changeCollege()" style="display:none;">
+                        <option value="all">All Colleges</option>
+                        <option value="gpj">Government Polytechnic Jaipur</option>
+                        <option value="rtu">Rajasthan Technical University Kota</option>
+                        <option value="geca">Government Engineering College Ajmer</option>
+                        <option value="itij">Industrial Training Institute Jodhpur</option>
+                        <option value="polu">Polytechnic College Udaipur</option>
+                    </select>
+                    <button class="btn-success" onclick="window.location.href='/upload'">📤 Single File Upload</button>
+                    <button class="btn-primary" onclick="window.location.href='/multi-upload'">📁 Multi-File Upload</button>
+                    <button class="btn-secondary" onclick="refreshDashboard()">🔄 Refresh</button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
+                        <h3 id="total-students">0</h3>
+                        <p>Total Students</p>
+                    </div>
+                </div>
+                <div class="stat-card alert">
+                    <div class="stat-icon">⚠️</div>
+                    <div class="stat-content">
+                        <h3 id="high-risk-students">0</h3>
+                        <p>High Risk Students</p>
+                    </div>
+                </div>
+                <div class="stat-card success">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <h3 id="low-risk-students">0</h3>
+                        <p>Low Risk Students</p>
+                    </div>
+                </div>
+                <div class="stat-card info">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-content">
+                        <h3 id="risk-percentage">0%</h3>
+                        <p>Risk Percentage</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Risk Distribution Chart -->
+            <div class="charts-grid">
+                <!-- Risk Distribution Chart -->
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>📊 Risk Distribution</h3>
+                        <select id="chart-type-selector" class="chart-selector">
+                            <option value="doughnut">Doughnut Chart</option>
+                            <option value="bar">Bar Chart</option>
+                            <option value="line">Trend Line</option>
+                        </select>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="risk-chart" width="400" height="300"></canvas>
+                        <div id="chart-legend" class="chart-legend"></div>
+                    </div>
+                </div>
+
+                <!-- Department Analysis -->
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>🏫 Department Analysis</h3>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="department-chart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Attendance vs Performance -->
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h3>📈 Attendance vs Performance</h3>
+                    </div>
+                    <div class="card-content">
+                        <canvas id="scatter-chart" width="400" height="300"></canvas>
+                    </div>
+                </div>
+
+                <!-- Critical Alerts -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>🚨 Critical Alerts</h3>
+                        <span class="badge" id="alerts-count">0</span>
+                    </div>
+                    <div class="card-content">
+                        <div id="alerts-list" class="alerts-container">
+                            <!-- Alerts will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Recent Students</h3>
+                    <div class="filters">
+                        <select id="department-filter" class="filter-select">
+                            <option value="">All Departments</option>
+                        </select>
+                        <select id="risk-filter" class="filter-select">
+                            <option value="">All Risk Levels</option>
+                            <option value="Critical">Critical</option>
+                            <option value="High">High</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Low">Low</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="table-container">
+                        <table class="students-table">
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Attendance</th>
+                                    <th>Marks</th>
+                                    <th>Risk Level</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="students-table-body">
+                                <!-- Students will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <button class="btn-secondary" id="prev-page">Previous</button>
+                        <span id="page-info">Page 1 of 1</span>
+                        <button class="btn-secondary" id="next-page">Next</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Students Section -->
+        <section id="students-section" class="content-section">
+            <div class="page-header">
+                <h2>👥 Students Management</h2>
+                <div class="header-actions">
+                    <button class="btn-success" onclick="window.location.href='/upload'">📤 Upload Data</button>
+                    <button class="btn-primary" onclick="exportStudents()">📥 Export Students</button>
+                </div>
+            </div>
+
+            <!-- Search and Filters -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🔍 Search & Filter Students</h3>
+                </div>
+                <div class="card-content">
+                    <div class="search-filters">
+                        <div class="search-box">
+                            <input type="text" id="search-input" placeholder="Search by name or student ID..." class="search-input">
+                            <button class="btn-primary" onclick="searchStudents()">Search</button>
+                        </div>
+                        <div class="filters-row">
+                            <select id="students-department-filter" class="filter-select">
+                                <option value="">All Departments</option>
+                            </select>
+                            <select id="students-risk-filter" class="filter-select">
+                                <option value="">All Risk Levels</option>
+                                <option value="Critical">Critical</option>
+                                <option value="High">High</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Low">Low</option>
+                            </select>
+                            <select id="students-region-filter" class="filter-select">
+                                <option value="">All Regions</option>
+                                <option value="Urban">Urban</option>
+                                <option value="Rural">Rural</option>
+                            </select>
+                            <button class="btn-secondary" onclick="clearStudentFilters()">Clear Filters</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Students Table -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>👥 All Students</h3>
+                    <div class="table-actions">
+                        <span id="students-count-display">0 students found</span>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <div class="table-container">
+                        <table class="students-table">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Name</th>
+                                    <th>Department</th>
+                                    <th>Attendance</th>
+                                    <th>Marks</th>
+                                    <th>Family Income</th>
+                                    <th>Region</th>
+                                    <th>Risk Level</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="all-students-table-body">
+                                <!-- Students will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <button class="btn-secondary" id="students-prev-page" onclick="changeStudentsPage(-1)">Previous</button>
+                        <span id="students-page-info">Page 1 of 1</span>
+                        <button class="btn-secondary" id="students-next-page" onclick="changeStudentsPage(1)">Next</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Student Detail Modal -->
+    <div id="student-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-student-name">Student Details</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="student-details">
+                    <!-- Student details will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

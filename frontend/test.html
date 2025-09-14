@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>System Test</title>
+</head>
+<body>
+    <h1>College System Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        async function testSystem() {
+            const results = document.getElementById('results');
+            
+            // Test session storage
+            const userCollege = sessionStorage.getItem('userCollege');
+            results.innerHTML += `<p>Session College: ${userCollege}</p>`;
+            
+            // Test GPJ API
+            try {
+                const response = await fetch('/api/dashboard/stats?college_filter=gpj');
+                const data = await response.json();
+                results.innerHTML += `<p>GPJ API: ${data.overview.total_students} students</p>`;
+            } catch (e) {
+                results.innerHTML += `<p>GPJ API Error: ${e}</p>`;
+            }
+            
+            // Test students API
+            try {
+                const response = await fetch('/api/students?college_filter=gpj&limit=5');
+                const data = await response.json();
+                results.innerHTML += `<p>GPJ Students API: ${data.students.length} students</p>`;
+            } catch (e) {
+                results.innerHTML += `<p>Students API Error: ${e}</p>`;
+            }
+        }
+        
+        testSystem();
+    </script>
+</body>
+</html>

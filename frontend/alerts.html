@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alerts - DTE Rajasthan</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/components.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo-section">
+                <img src="https://via.placeholder.com/40x40/1e40af/ffffff?text=DTE" alt="DTE Logo" class="logo">
+                <h1>DTE Rajasthan - Alert Management</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn-secondary" onclick="window.location.href='/'">← Back to Dashboard</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content" style="margin-left: 0;">
+        <div class="page-header">
+            <h2>🚨 Student Alerts</h2>
+            <div class="header-actions">
+                <button class="btn-primary" onclick="refreshAlerts()">🔄 Refresh Alerts</button>
+                <button class="btn-success" onclick="generateAlerts()">⚡ Generate New Alerts</button>
+            </div>
+        </div>
+
+        <!-- Alert Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card alert">
+                <div class="stat-icon">🔴</div>
+                <div class="stat-content">
+                    <h3 id="critical-alerts-count">0</h3>
+                    <p>Critical Alerts</p>
+                </div>
+            </div>
+            <div class="stat-card warning">
+                <div class="stat-icon">🟡</div>
+                <div class="stat-content">
+                    <h3 id="high-alerts-count">0</h3>
+                    <p>High Risk Alerts</p>
+                </div>
+            </div>
+            <div class="stat-card info">
+                <div class="stat-icon">📞</div>
+                <div class="stat-content">
+                    <h3 id="contacted-count">0</h3>
+                    <p>Students Contacted</p>
+                </div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <h3 id="resolved-count">0</h3>
+                    <p>Issues Resolved</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Filters -->
+        <div class="card">
+            <div class="card-header">
+                <h3>🔍 Filter Alerts</h3>
+            </div>
+            <div class="card-content">
+                <div class="filters-row">
+                    <select id="alert-priority-filter" class="filter-select">
+                        <option value="">All Priorities</option>
+                        <option value="Critical">Critical</option>
+                        <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                    </select>
+                    <select id="alert-status-filter" class="filter-select">
+                        <option value="">All Status</option>
+                        <option value="New">New</option>
+                        <option value="Contacted">Contacted</option>
+                        <option value="Resolved">Resolved</option>
+                    </select>
+                    <select id="alert-department-filter" class="filter-select">
+                        <option value="">All Departments</option>
+                    </select>
+                    <button class="btn-secondary" onclick="clearAlertFilters()">Clear Filters</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Critical Alerts Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>🔴 Critical Alerts - Immediate Action Required</h3>
+                <span class="badge critical" id="critical-badge">0</span>
+            </div>
+            <div class="card-content">
+                <div id="critical-alerts-container" class="alerts-grid">
+                    <!-- Critical alerts will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- High Risk Alerts Section -->
+        <div class="card">
+            <div class="card-header">
+                <h3>🟡 High Risk Alerts - Monitor Closely</h3>
+                <span class="badge warning" id="high-badge">0</span>
+            </div>
+            <div class="card-content">
+                <div id="high-alerts-container" class="alerts-grid">
+                    <!-- High risk alerts will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert History -->
+        <div class="card">
+            <div class="card-header">
+                <h3>📋 Recent Alert Actions</h3>
+            </div>
+            <div class="card-content">
+                <div id="alert-history" class="alert-history">
+                    <!-- Alert history will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Contact Student Modal -->
+    <div id="contact-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📞 Contact Student</h3>
+                <button class="modal-close" onclick="closeContactModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="contact-student-info">
+                    <!-- Student info will be loaded here -->
+                </div>
+                <div class="contact-actions">
+                    <h4>Contact Methods:</h4>
+                    <div class="contact-buttons">
+                        <button class="btn-primary" onclick="sendEmail()">📧 Send Email to Student</button>
+                        <button class="btn-primary" onclick="sendSMS()">📱 Send SMS to Student</button>
+                        <button class="btn-secondary" onclick="contactMentor()">👨‍🏫 Notify Mentor</button>
+                        <button class="btn-warning" onclick="escalateToAdmin()">⚠️ Escalate to Admin</button>
+                    </div>
+                </div>
+                <div class="action-notes">
+                    <h4>Action Notes:</h4>
+                    <textarea id="action-notes" placeholder="Enter notes about the action taken..." rows="3"></textarea>
+                    <button class="btn-success" onclick="markAsContacted()">✅ Mark as Contacted</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/alerts.js"></script>
+</body>
+</html>

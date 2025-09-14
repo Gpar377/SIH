@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head><title>Direct API Test</title></head>
+<body>
+<h1>Direct API Test</h1>
+<button onclick="testAPI()">Test GPJ API</button>
+<div id="result"></div>
+
+<script>
+async function testAPI() {
+    const result = document.getElementById('result');
+    
+    try {
+        // Test dashboard stats
+        const statsResponse = await fetch('/api/dashboard/stats?college_filter=gpj');
+        const statsData = await statsResponse.json();
+        result.innerHTML += `<p>Dashboard Stats: ${JSON.stringify(statsData)}</p>`;
+        
+        // Test students API
+        const studentsResponse = await fetch('/api/students?college_filter=gpj&limit=5');
+        const studentsData = await studentsResponse.json();
+        result.innerHTML += `<p>Students: ${JSON.stringify(studentsData)}</p>`;
+        
+    } catch (error) {
+        result.innerHTML += `<p>Error: ${error}</p>`;
+    }
+}
+</script>
+</body>
+</html>
