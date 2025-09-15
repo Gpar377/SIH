@@ -1,112 +1,63 @@
 # Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.so
+*.pyo
+*.pyd
 .Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Virtual Environment
-venv/
 env/
-ENV/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.pytest_cache/
 
 # IDE
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
 Thumbs.db
 
 # Logs
 *.log
 logs/
 
-# Database files (keep structure, ignore data)
-*.db-journal
-*.db-wal
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Environment variables
+.env
+.env.local
+.env.production
 
 # Temporary files
 *.tmp
 *.temp
-
-# Test files and experimental code
-test_*.py
-*_test.py
-experimental/
-sandbox/
 temp/
+tmp/
 
-# Old/unused frontend files
-FN/
-frontend/css/
-frontend/js/
-frontend/*.html
+# Models (if large)
+models/*.pkl
+models/*.joblib
 
-# Backup files
-*.bak
-*.backup
-*_backup.*
-*_old.*
+# Uploads
+uploads/
+static/uploads/
 
-# Development utilities
-clear_*.py
-generate_*.py
-populate_*.py
-init_*.py
-*_setup.py
-*_demo.py
-*_complete.py
-
-# Batch files (Windows specific)
-*.bat
-
-# Documentation drafts
-*_DRAFT.*
-NOTES.md
-TODO.md
-
-# Sample data files
-*.csv
-*.xlsx
-*.xls
-
-# Uninstall utilities
-Uninstall/
-uninstall_*
-
-# College-specific data folders (keep structure in README)
-gpj/
-geca/
-itij/
-polu/
-rtu/
-
-# System verification files
-SYSTEM_VERIFICATION.md
-SECURITY_AUDIT_REPORT.md
-FINAL_SYSTEM_TEST.py
-
-# Keep only essential files:
-# - Core backend system
-# - Production frontend
-# - Documentation
-# - Requirements
-# - Database schema (empty)
+# Build
+build/
+dist/
+*.egg-info/
