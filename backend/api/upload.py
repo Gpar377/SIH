@@ -26,8 +26,17 @@ class ColumnMapping(BaseModel):
 async def upload_file(file: UploadFile = File(...)):
     """Upload and analyze file structure"""
     try:
+        # Validate file extension
+        import os
+        allowed_extensions = ['.csv', '.xlsx', '.xls']
+        file_extension = os.path.splitext(file.filename)[1].lower()
+        if file_extension not in allowed_extensions:
+            raise HTTPException(status_code=400, detail=f"File type not allowed. Allowed: {allowed_extensions}")
+        
         # Read file content
         content = await file.read()
+        if len(content) > 10 * 1024 * 1024:  # 10MB limit
+            raise HTTPException(status_code=400, detail="File too large. Max: 10MB")
         df = file_processor.read_file(content, file.filename)
         
         # Detect columns and suggest mappings
@@ -65,8 +74,17 @@ from fastapi import Form
 async def process_data(file: UploadFile = File(...), mappings: str = Form(...), session_id: str = Form(...)):
     """Process uploaded data with column mappings"""
     try:
+        # Validate file extension
+        import os
+        allowed_extensions = ['.csv', '.xlsx', '.xls']
+        file_extension = os.path.splitext(file.filename)[1].lower()
+        if file_extension not in allowed_extensions:
+            raise HTTPException(status_code=400, detail=f"File type not allowed. Allowed: {allowed_extensions}")
+        
         # Read file again
         content = await file.read()
+        if len(content) > 10 * 1024 * 1024:  # 10MB limit
+            raise HTTPException(status_code=400, detail="File too large. Max: 10MB")
         df = file_processor.read_file(content, file.filename)
         
         # Parse mappings from form data

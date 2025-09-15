@@ -1,12 +1,11 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from fastapi.security import HTTPBearer
 from pydantic import BaseModel
+from typing import Optional
 from auth.auth import AuthService, User, UserRole, get_current_user
-from models.multi_tenant_db import MultiTenantDatabase
 
 router = APIRouter()
 auth_service = AuthService()
-multi_db = MultiTenantDatabase()
 
 class LoginRequest(BaseModel):
     username: str
@@ -21,7 +20,7 @@ class UserInfo(BaseModel):
     user_id: str
     username: str
     role: str
-    college_id: str = None
+    college_id: Optional[str] = None
 
 @router.post("/login", response_model=LoginResponse)
 async def login(request: LoginRequest):
@@ -37,8 +36,7 @@ async def login(request: LoginRequest):
     
     access_token = auth_service.create_access_token(user)
     
-    # Log login action
-    multi_db.log_user_action(user, "LOGIN", "auth_system")
+    # Login successful
     
     return LoginResponse(
         access_token=access_token,
@@ -64,7 +62,6 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
 @router.post("/logout")
 async def logout(current_user: User = Depends(get_current_user)):
     """Logout user (client should discard token)"""
-    multi_db.log_user_action(current_user, "LOGOUT", "auth_system")
     return {"message": "Successfully logged out"}
 
 @router.get("/colleges")
@@ -77,7 +74,7 @@ async def get_colleges(current_user: User = Depends(get_current_user)):
         )
     
     import sqlite3
-    with sqlite3.connect(multi_db.government_db) as conn:
+    with sqlite3.connect("government_master.db") as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT college_id, college_name, location, total_students, high_risk_students FROM colleges")
         colleges = cursor.fetchall()

@@ -24,13 +24,27 @@ class FileProcessor:
         
         try:
             if file_ext == '.csv':
-                df = pd.read_csv(io.BytesIO(file_content))
+                # Try different encodings and separators
+                encodings = ['utf-8', 'latin-1', 'cp1252']
+                separators = [',', ';', '\t']
+                
+                for encoding in encodings:
+                    for sep in separators:
+                        try:
+                            df = pd.read_csv(io.BytesIO(file_content), encoding=encoding, sep=sep, on_bad_lines='skip')
+                            if len(df.columns) > 1 and len(df) > 0:
+                                return df
+                        except:
+                            continue
+                
+                # Fallback: try with error handling
+                df = pd.read_csv(io.BytesIO(file_content), encoding='utf-8', on_bad_lines='skip', sep=None, engine='python')
             else:  # Excel files
                 df = pd.read_excel(io.BytesIO(file_content))
             
             return df
         except Exception as e:
-            raise ValueError(f"Error reading file: {str(e)}")
+            raise ValueError(f"Error reading file: {str(e)}. Please ensure the file is properly formatted.")
     
     def detect_columns(self, df: pd.DataFrame) -> Dict:
         """Detect and suggest column mappings"""
@@ -122,8 +136,11 @@ class FileProcessor:
         df_clean = df.copy()
         
         # Generate student_id if missing
-        if 'student_id' not in df_clean.columns or df_clean['student_id'].isnull().any():
+        if 'student_id' not in df_clean.columns:
             df_clean['student_id'] = df_clean.index.map(lambda x: f"STU_{x:04d}")
+        elif df_clean['student_id'].isnull().any():
+            null_mask = df_clean['student_id'].isnull()
+            df_clean.loc[null_mask, 'student_id'] = df_clean.loc[null_mask].index.map(lambda x: f"STU_{x:04d}")
         
         # Clean numerical columns
         numerical_columns = ['attendance_percentage', 'marks', 'family_income', 'family_size', 'distance_from_college']

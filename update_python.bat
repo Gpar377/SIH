@@ -1,1 +1,0 @@
-choco upgrade python -y 

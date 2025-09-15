@@ -25,11 +25,6 @@ venv/
 env/
 ENV/
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-
 # IDE
 .vscode/
 .idea/
@@ -42,14 +37,76 @@ Thumbs.db
 
 # Logs
 *.log
+logs/
 
-# Environment variables
-.env
-.env.local
-
-# Node modules (if any)
-node_modules/
+# Database files (keep structure, ignore data)
+*.db-journal
+*.db-wal
 
 # Temporary files
 *.tmp
 *.temp
+
+# Test files and experimental code
+test_*.py
+*_test.py
+experimental/
+sandbox/
+temp/
+
+# Old/unused frontend files
+FN/
+frontend/css/
+frontend/js/
+frontend/*.html
+
+# Backup files
+*.bak
+*.backup
+*_backup.*
+*_old.*
+
+# Development utilities
+clear_*.py
+generate_*.py
+populate_*.py
+init_*.py
+*_setup.py
+*_demo.py
+*_complete.py
+
+# Batch files (Windows specific)
+*.bat
+
+# Documentation drafts
+*_DRAFT.*
+NOTES.md
+TODO.md
+
+# Sample data files
+*.csv
+*.xlsx
+*.xls
+
+# Uninstall utilities
+Uninstall/
+uninstall_*
+
+# College-specific data folders (keep structure in README)
+gpj/
+geca/
+itij/
+polu/
+rtu/
+
+# System verification files
+SYSTEM_VERIFICATION.md
+SECURITY_AUDIT_REPORT.md
+FINAL_SYSTEM_TEST.py
+
+# Keep only essential files:
+# - Core backend system
+# - Production frontend
+# - Documentation
+# - Requirements
+# - Database schema (empty)

@@ -16,6 +16,7 @@ from api.upload import upload_router
 from api.students import students_router
 from api.dashboard import dashboard_router
 from api.multi_upload import multi_upload_router
+from api.multi_file_upload import router as multi_file_router
 from api.auth_routes import router as auth_router
 
 app = FastAPI(
@@ -28,8 +29,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:8010",
-        "http://127.0.0.1:8010",
+        "http://localhost:8012",
+        "http://127.0.0.1:8012",
         "https://dte-rajasthan.gov.in",  # Production domain
         "https://*.dte-rajasthan.gov.in"  # Subdomains
     ],
@@ -45,7 +46,7 @@ risk_engine = RiskEngine()
 file_processor = FileProcessor()
 
 # Mount static files
-app.mount("/static", StaticFiles(directory="../frontend"), name="static")
+app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/css", StaticFiles(directory="../frontend/css"), name="css")
 app.mount("/js", StaticFiles(directory="../frontend/js"), name="js")
 app.mount("/frontend", StaticFiles(directory="../frontend"), name="frontend")
@@ -56,30 +57,35 @@ app.include_router(upload_router, prefix="/api")
 app.include_router(students_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(multi_upload_router, prefix="/api")
+app.include_router(multi_file_router, prefix="/api", tags=["multi-file-upload"])
 
 @app.get("/")
 async def serve_frontend():
-    return FileResponse("../frontend/login.html")
+    return FileResponse("static/complete_frontend.html")
+
+@app.get("/login-government")
+async def serve_government_login():
+    return FileResponse("static/complete_frontend.html")
+
+@app.get("/login-college")
+async def serve_college_login():
+    return FileResponse("static/college_login.html")
+
+@app.get("/dashboard")
+async def serve_dashboard():
+    return FileResponse("static/unified_dashboard.html")
 
 @app.get("/upload")
 async def serve_upload():
-    return FileResponse("../frontend/upload.html")
+    return FileResponse("static/upload_interface.html")
 
 @app.get("/students")
 async def serve_students():
-    return FileResponse("../frontend/students.html")
-
-@app.get("/frontend/students.html")
-async def serve_students_direct():
-    return FileResponse("../frontend/students.html")
+    return FileResponse("static/students_management.html")
 
 @app.get("/alerts")
 async def serve_alerts():
-    return FileResponse("../frontend/alerts.html")
-
-@app.get("/frontend/alerts.html")
-async def serve_alerts_direct():
-    return FileResponse("../frontend/alerts.html")
+    return FileResponse("static/alerts_interface.html")
 
 @app.get("/multi-upload")
 async def serve_multi_upload():
@@ -121,4 +127,4 @@ async def serve_test():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8010)
+    uvicorn.run(app, host="0.0.0.0", port=8011)

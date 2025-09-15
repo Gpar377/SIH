@@ -41,8 +41,7 @@ class AuthService:
                     password_hash TEXT NOT NULL,
                     role TEXT NOT NULL,
                     college_id TEXT,
-                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                    is_active BOOLEAN DEFAULT TRUE
+                    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
             
@@ -68,22 +67,31 @@ class AuthService:
         return pwd_context.verify(plain_password, hashed_password)
     
     def authenticate_user(self, username: str, password: str) -> Optional[User]:
-        with sqlite3.connect("auth.db") as conn:
-            cursor = conn.cursor()
-            cursor.execute('''
-                SELECT user_id, username, password_hash, role, college_id 
-                FROM users WHERE username = ? AND is_active = TRUE
-            ''', (username,))
-            
-            result = cursor.fetchone()
-            if not result:
-                return None
-            
-            user_id, username, password_hash, role, college_id = result
-            if not self.verify_password(password, password_hash):
-                return None
-            
-            return User(user_id, username, UserRole(role), college_id)
+        try:
+            with sqlite3.connect("auth.db") as conn:
+                cursor = conn.cursor()
+                cursor.execute('''
+                    SELECT user_id, username, password_hash, role, college_id 
+                    FROM users WHERE username = ?
+                ''', (username,))
+                
+                result = cursor.fetchone()
+                if not result:
+                    return None
+                
+                user_id, username, password_hash, role, college_id = result
+                if not self.verify_password(password, password_hash):
+                    return None
+                
+                # Validate role before creating User
+                try:
+                    user_role = UserRole(role)
+                except ValueError:
+                    return None
+                
+                return User(user_id, username, user_role, college_id)
+        except sqlite3.Error:
+            return None
     
     def create_access_token(self, user: User) -> str:
         expire = datetime.utcnow() + timedelta(minutes=AuthConfig.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -137,6 +145,12 @@ def get_user_database_path(user: User) -> str:
     if user.role == UserRole.GOVERNMENT_ADMIN:
         return "government_master.db"
     elif user.college_id:
-        return f"{user.college_id}_students.db"
+        # Sanitize college_id to prevent path traversal
+        import html
+        safe_college_id = html.escape(user.college_id)
+        allowed_colleges = ['gpj', 'geca', 'rtu', 'itij', 'polu']
+        if safe_college_id not in allowed_colleges:
+            raise HTTPException(status_code=400, detail="Invalid college configuration")
+        return f"{safe_college_id}_students.db"
     else:
         raise HTTPException(status_code=400, detail="Invalid user configuration")

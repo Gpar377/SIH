@@ -2,15 +2,9 @@ from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel
 from typing import Dict, List, Optional
 
-from models.multi_tenant_db import MultiTenantDatabase
-from models.risk_engine import RiskEngine
 from auth.auth import User, UserRole, get_current_user, require_role
 
 students_router = APIRouter()
-
-# Global instances
-multi_db = MultiTenantDatabase()
-risk_engine = RiskEngine()
 
 class StudentUpdate(BaseModel):
     attendance_percentage: Optional[float] = None
@@ -28,25 +22,58 @@ async def get_students(
     offset: int = Query(0, ge=0),
     department: Optional[str] = None,
     risk_level: Optional[str] = None,
+    college: Optional[str] = None,
     current_user: User = Depends(get_current_user)
 ):
     """Get students with pagination and filters (role-based access)"""
     try:
-        # Log access attempt
-        multi_db.log_user_action(current_user, "VIEW_STUDENTS", "students_list")
+        import sqlite3
+        import pandas as pd
         
-        # Get students based on user role and permissions
-        students = multi_db.get_students_for_user(current_user, limit, offset)
+        students = []
         
-        # Apply additional filters if provided
+        if current_user.role == UserRole.GOVERNMENT_ADMIN:
+            # Government admin can see all colleges or filter by specific college
+            colleges = ['gpj', 'geca', 'rtu', 'itij', 'polu']
+            if college:
+                colleges = [college]
+            
+            for college_id in colleges:
+                db_path = f"{college_id}_students.db"
+                try:
+                    with sqlite3.connect(db_path) as conn:
+                        query = "SELECT * FROM students ORDER BY risk_score DESC"
+                        df = pd.read_sql_query(query, conn)
+                        college_students = df.to_dict('records')
+                        students.extend(college_students)
+                except Exception as e:
+                    print(f"Error reading {college_id}: {e}")
+                    continue
+        else:
+            # College admin sees only their students
+            db_path = f"{current_user.college_id}_students.db"
+            try:
+                with sqlite3.connect(db_path) as conn:
+                    query = "SELECT * FROM students ORDER BY risk_score DESC"
+                    df = pd.read_sql_query(query, conn)
+                    students = df.to_dict('records')
+            except Exception as e:
+                print(f"Error reading college data: {e}")
+                students = []
+        
+        # Apply filters
         if department:
-            students = [s for s in students if s.get('department') == department]
+            students = [s for s in students if s.get('department', '').lower() == department.lower()]
         if risk_level:
-            students = [s for s in students if s.get('risk_level') == risk_level]
+            students = [s for s in students if s.get('risk_level', '').lower() == risk_level.lower()]
+        
+        # Apply pagination
+        total = len(students)
+        students = students[offset:offset + limit]
         
         return {
             "students": students,
-            "total": len(students),
+            "total": total,
             "limit": limit,
             "offset": offset,
             "user_role": current_user.role.value,
@@ -54,6 +81,7 @@ async def get_students(
         }
         
     except Exception as e:
+        print(f"Error in get_students: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 @students_router.get("/student/{student_id}")
