@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Alerts - EduAlert</title>
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --rajasthan-orange: #ea580c;
+            --light-blue: #eff6ff;
+            --success-green: #16a34a;
+            --danger-red: #dc2626;
+            --warning-yellow: #d97706;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #d1d5db;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Navigation - Same as other pages */
+        .navbar {
+            background: var(--bg-primary);
+            border-bottom: 2px solid var(--primary-blue);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo-text .logo-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .logout-btn {
+            background: var(--danger-red);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        .nav-menu {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+        }
+
+        .nav-menu-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            padding: 1rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Alert Summary */
+        .alert-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-blue);
+        }
+
+        .summary-card.critical::before {
+            background: var(--danger-red);
+        }
+
+        .summary-card.high::before {
+            background: var(--warning-yellow);
+        }
+
+        .summary-card.resolved::before {
+            background: var(--success-green);
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .summary-title {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .summary-icon {
+            font-size: 1.5rem;
+        }
+
+        .summary-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Filters */
+        .filters-section {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .filter-input {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        /* Alerts List */
+        .alerts-container {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .alerts-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .alerts-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .alerts-stats {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .alerts-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .alert-item {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            gap: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .alert-item:hover {
+            background: var(--bg-secondary);
+        }
+
+        .alert-item:last-child {
+            border-bottom: none;
+        }
+
+        .alert-priority {
+            width: 4px;
+            background: var(--border-color);
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .alert-priority.critical {
+            background: var(--danger-red);
+        }
+
+        .alert-priority.high {
+            background: var(--warning-yellow);
+        }
+
+        .alert-priority.medium {
+            background: var(--primary-blue);
+        }
+
+        .alert-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .alert-icon.critical {
+            background: #fef2f2;
+            color: var(--danger-red);
+        }
+
+        .alert-icon.high {
+            background: #fef3c7;
+            color: var(--warning-yellow);
+        }
+
+        .alert-icon.medium {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+        }
+
+        .alert-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: between;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+
+        .alert-student {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        .alert-time {
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            flex-shrink: 0;
+        }
+
+        .alert-message {
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .alert-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .alert-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .detail-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .alert-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.375rem 0.875rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .action-btn.primary {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .action-btn.primary:hover {
+            background: #1d4ed8;
+        }
+
+        .action-btn.danger {
+            background: var(--danger-red);
+            color: white;
+            border-color: var(--danger-red);
+        }
+
+        .action-btn.danger:hover {
+            background: #b91c1c;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .empty-message {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Loading State */
+        .loading-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 3rem;
+            height: 3rem;
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .alert-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .alert-header {
+                flex-direction: column;
+                align-items: start;
+                gap: 0.25rem;
+            }
+            
+            .alert-details {
+                gap: 0.5rem;
+            }
+            
+            .alert-actions {
+                justify-content: stretch;
+            }
+            
+            .action-btn {
+                flex: 1;
+                text-align: center;
+            }
+        }
+
+        /* Notification Badge */
+        .notification-badge {
+            position: relative;
+        }
+
+        .notification-badge::after {
+            content: attr(data-count);
+            position: absolute;
+            top: -0.5rem;
+            right: -0.5rem;
+            background: var(--danger-red);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.25rem 0.5rem;
+            border-radius: 9999px;
+            min-width: 1.25rem;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="/static/logo.jpg" alt="EduAlert Logo">
+                </div>
+                <div class="logo-text">
+                    <div class="logo-title">EduAlert</div>
+                    <div class="logo-subtitle">Student Alerts</div>
+                </div>
+            </div>
+            
+            <div class="nav-actions">
+                <div class="user-info">
+                    <span id="userWelcome">Loading...</span>
+                    <span class="user-badge" id="userRole">USER</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+        <div class="nav-menu-container">
+            <a href="/dashboard" class="nav-item">Dashboard</a>
+            <a href="/students" class="nav-item">Students</a>
+            <a href="/upload" class="nav-item">Upload Data</a>
+            <a href="/alerts" class="nav-item active">
+                <span class="notification-badge" data-count="5">Alerts</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="page-header">
+            <h1 class="page-title">Student Alerts</h1>
+            <p class="page-subtitle">Monitor students requiring immediate attention and intervention</p>
+        </div>
+
+        <!-- Alert Summary -->
+        <div class="alert-summary">
+            <div class="summary-card critical">
+                <div class="summary-header">
+                    <span class="summary-title">Critical Alerts</span>
+                    <span class="summary-icon">🚨</span>
+                </div>
+                <div class="summary-value" id="criticalCount">0</div>
+                <div class="summary-description">Immediate action required</div>
+            </div>
+
+            <div class="summary-card high">
+                <div class="summary-header">
+                    <span class="summary-title">High Priority</span>
+                    <span class="summary-icon">⚠️</span>
+                </div>
+                <div class="summary-value" id="highCount">0</div>
+                <div class="summary-description">Attention needed soon</div>
+            </div>
+
+            <div class="summary-card">
+                <div class="summary-header">
+                    <span class="summary-title">Medium Priority</span>
+                    <span class="summary-icon">📋</span>
+                </div>
+                <div class="summary-value" id="mediumCount">0</div>
+                <div class="summary-description">Monitor closely</div>
+            </div>
+
+            <div class="summary-card resolved">
+                <div class="summary-header">
+                    <span class="summary-title">Resolved Today</span>
+                    <span class="summary-icon">✅</span>
+                </div>
+                <div class="summary-value" id="resolvedCount">0</div>
+                <div class="summary-description">Successfully addressed</div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Priority Level</label>
+                    <select class="filter-input" id="priorityFilter" onchange="applyFilters()">
+                        <option value="">All Priorities</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Department</label>
+                    <select class="filter-input" id="departmentFilter" onchange="applyFilters()">
+                        <option value="">All Departments</option>
+                        <option value="computer-science">Computer Science</option>
+                        <option value="mechanical">Mechanical</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="civil">Civil</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Time Period</label>
+                    <select class="filter-input" id="timeFilter" onchange="applyFilters()">
+                        <option value="today">Today</option>
+                        <option value="week">This Week</option>
+                        <option value="month">This Month</option>
+                        <option value="all">All Time</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Status</label>
+                    <select class="filter-input" id="statusFilter" onchange="applyFilters()">
+                        <option value="active">Active Only</option>
+                        <option value="resolved">Resolved</option>
+                        <option value="all">All Statuses</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading alerts...</p>
+        </div>
+
+        <!-- Alerts Container -->
+        <div id="alertsContainer" class="alerts-container" style="display: none;">
+            <div class="alerts-header">
+                <h3 class="alerts-title">Active Alerts</h3>
+                <div class="alerts-stats" id="alertsStats">0 alerts found</div>
+            </div>
+            
+            <div class="alerts-list" id="alertsList">
+                <!-- Alerts will be populated here -->
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">🎉</div>
+            <h3 class="empty-title">No Alerts Found</h3>
+            <p class="empty-message">Great news! There are no active alerts matching your criteria.</p>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.875rem; border-top: 1px solid var(--border-color); margin-top: 2rem;">
+        Made with ❤️
+    </footer>
+
+    <script>
+        // Configuration
+        const API_BASE = window.location.origin;
+        let alertsData = [];
+        let filteredAlerts = [];
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('access_token');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (!token || !userInfo) {
+                window.location.href = '/login';
+                return false;
+            }
+            
+            try {
+                const user = JSON.parse(userInfo);
+                document.getElementById('userWelcome').textContent = `Welcome, ${user.username}`;
+                document.getElementById('userRole').textContent = user.role.toUpperCase();
+                return true;
+            } catch (e) {
+                logout();
+                return false;
+            }
+        }
+
+        // API call with authentication
+        async function apiCall(endpoint, options = {}) {
+            const token = localStorage.getItem('access_token');
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    ...defaultOptions
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return null;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+        // Load alerts data
+        async function loadAlerts() {
+            document.getElementById('loadingState').style.display = 'block';
+            document.getElementById('alertsContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+
+            try {
+                // Load alerts from API
+                const data = await apiCall('/api/dashboard/alerts');
+                
+                if (!data || !data.alerts) {
+                    // Generate mock data for demonstration
+                    alertsData = generateMockAlerts();
+                } else {
+                    alertsData = data.alerts;
+                }
+
+                filteredAlerts = [...alertsData];
+                updateSummaryCards();
+                updateAlertsList();
+                
+                document.getElementById('loadingState').style.display = 'none';
+                
+                if (filteredAlerts.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                } else {
+                    document.getElementById('alertsContainer').style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error('Failed to load alerts:', error);
+                // Generate mock data as fallback
+                alertsData = generateMockAlerts();
+                filteredAlerts = [...alertsData];
+                updateSummaryCards();
+                updateAlertsList();
+                
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('alertsContainer').style.display = 'block';
+            }
+        }
+
+        // Generate mock alerts based on dashboard data
+        function generateMockAlerts() {
+            const dashStats = JSON.parse(sessionStorage.getItem('dashboardStats') || '{}');
+            const highRisk = dashStats.high_risk_students || 4;
+            const alerts = [];
+            
+            // Generate alerts matching high risk count
+            for (let i = 0; i < highRisk; i++) {
+                const priority = i < Math.floor(highRisk * 0.5) ? 'critical' : 'high';
+                alerts.push({
+                    id: `alert_${i}`,
+                    student_id: `STU${String(i + 1).padStart(3, '0')}`,
+                    student_name: `Student ${i + 1}`,
+                    department: ['Computer Science', 'Mechanical', 'Electrical', 'Civil'][i % 4],
+                    priority: priority,
+                    message: priority === 'critical' ? 'Critical dropout risk' : 'High dropout risk',
+                    attendance: 30 + Math.random() * 40,
+                    marks: 25 + Math.random() * 35,
+                    risk_score: 65 + Math.random() * 35,
+                    created_at: new Date(Date.now() - Math.random() * 48 * 60 * 60 * 1000),
+                    status: 'active'
+                });
+            }
+            
+            return alerts;
+        }
+
+        // Update summary cards
+        function updateSummaryCards() {
+            const counts = alertsData.reduce((acc, alert) => {
+                if (alert.status === 'resolved') {
+                    acc.resolved++;
+                } else {
+                    acc[alert.priority]++;
+                }
+                return acc;
+            }, { critical: 0, high: 0, medium: 0, resolved: 0 });
+
+            document.getElementById('criticalCount').textContent = counts.critical;
+            document.getElementById('highCount').textContent = counts.high;
+            document.getElementById('mediumCount').textContent = counts.medium;
+            document.getElementById('resolvedCount').textContent = counts.resolved;
+
+            // Update notification badge
+            const totalActive = counts.critical + counts.high + counts.medium;
+            const badge = document.querySelector('.notification-badge');
+            if (badge) {
+                badge.setAttribute('data-count', totalActive);
+            }
+        }
+
+        // Update alerts list
+        function updateAlertsList() {
+            const alertsList = document.getElementById('alertsList');
+            const alertsStats = document.getElementById('alertsStats');
+            
+            alertsStats.textContent = `${filteredAlerts.length} alerts found`;
+
+            if (filteredAlerts.length === 0) {
+                alertsList.innerHTML = '';
+                return;
+            }
+
+            alertsList.innerHTML = filteredAlerts.map(alert => `
+                <div class="alert-item">
+                    <div class="alert-priority ${alert.priority}"></div>
+                    <div class="alert-icon ${alert.priority}">
+                        ${getPriorityIcon(alert.priority)}
+                    </div>
+                    <div class="alert-content">
+                        <div class="alert-header">
+                            <div class="alert-student">${alert.student_name} (${alert.student_id})</div>
+                            <div class="alert-time">${formatTimeAgo(alert.created_at)}</div>
+                        </div>
+                        <div class="alert-message">${alert.message}</div>
+                        <div class="alert-details">
+                            <div class="alert-detail">
+                                <span class="detail-label">Department</span>
+                                <span class="detail-value">${alert.department}</span>
+                            </div>
+                            <div class="alert-detail">
+                                <span class="detail-label">Attendance</span>
+                                <span class="detail-value">${alert.attendance}%</span>
+                            </div>
+                            <div class="alert-detail">
+                                <span class="detail-label">Marks</span>
+                                <span class="detail-value">${alert.marks}</span>
+                            </div>
+                            <div class="alert-detail">
+                                <span class="detail-label">Risk Score</span>
+                                <span class="detail-value">${alert.risk_score}/100</span>
+                            </div>
+                        </div>
+                        <div class="alert-actions">
+                            <button class="action-btn primary" onclick="viewStudent('${alert.student_id}')">View Student</button>
+                            <button class="action-btn" onclick="sendMentorAlert('${alert.student_id}', '${alert.student_name}')">📧 Alert Mentor</button>
+                            <button class="action-btn" onclick="contactStudent('${alert.student_id}')">Contact</button>
+                            <button class="action-btn danger" onclick="resolveAlert('${alert.id}')">Mark Resolved</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Apply filters
+        function applyFilters() {
+            const priority = document.getElementById('priorityFilter').value;
+            const department = document.getElementById('departmentFilter').value;
+            const timeFilter = document.getElementById('timeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            filteredAlerts = alertsData.filter(alert => {
+                // Priority filter
+                if (priority && alert.priority !== priority) return false;
+                
+                // Department filter
+                if (department && alert.department.toLowerCase().replace(/\s+/g, '-') !== department) return false;
+                
+                // Status filter
+                if (status !== 'all' && alert.status !== status) return false;
+                
+                // Time filter
+                if (timeFilter !== 'all') {
+                    const now = new Date();
+                    const alertDate = new Date(alert.created_at);
+                    const diffDays = (now - alertDate) / (1000 * 60 * 60 * 24);
+                    
+                    switch (timeFilter) {
+                        case 'today':
+                            if (diffDays > 1) return false;
+                            break;
+                        case 'week':
+                            if (diffDays > 7) return false;
+                            break;
+                        case 'month':
+                            if (diffDays > 30) return false;
+                            break;
+                    }
+                }
+                
+                return true;
+            });
+
+            updateAlertsList();
+            
+            // Show/hide empty state
+            if (filteredAlerts.length === 0) {
+                document.getElementById('alertsContainer').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+                document.querySelector('.empty-title').textContent = 'No Alerts Match Filters';
+                document.querySelector('.empty-message').textContent = 'Try adjusting your filter criteria to see more alerts.';
+            } else {
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('alertsContainer').style.display = 'block';
+            }
+        }
+
+        // Utility functions
+        function getPriorityIcon(priority) {
+            switch (priority) {
+                case 'critical': return '🚨';
+                case 'high': return '⚠️';
+                case 'medium': return '📋';
+                default: return '📋';
+            }
+        }
+
+        function formatTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - new Date(date);
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+            if (diffMins < 60) return `${diffMins} minutes ago`;
+            if (diffHours < 24) return `${diffHours} hours ago`;
+            return `${diffDays} days ago`;
+        }
+
+        // Action functions
+        function viewStudent(studentId) {
+            window.location.href = `/student/${studentId}`;
+        }
+
+        function contactStudent(studentId) {
+            alert(`Contact functionality for ${studentId} would be implemented here`);
+        }
+
+        function scheduleIntervention(alertId) {
+            alert(`Scheduling intervention for alert ${alertId}`);
+        }
+
+        async function sendMentorAlert(studentId, studentName) {
+            try {
+                const response = await apiCall('/api/send-alert', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        student_id: studentId,
+                        recipient_email: 'mentor@college.edu'
+                    })
+                });
+                
+                if (response && response.success) {
+                    alert(`✅ Alert sent successfully!\n\nStudent: ${studentName}\nSent to: ${response.message.split(' to ')[1]}\nTime: ${new Date().toLocaleString()}`);
+                } else {
+                    throw new Error('Failed to send alert');
+                }
+            } catch (error) {
+                console.error('Email alert failed:', error);
+                alert('❌ Failed to send alert. Please try again.');
+            }
+        }
+
+        function resolveAlert(alertId) {
+            if (confirm('Mark this alert as resolved?')) {
+                // Update alert status
+                const alert = alertsData.find(a => a.id === alertId);
+                if (alert) {
+                    alert.status = 'resolved';
+                    updateSummaryCards();
+                    applyFilters();
+                }
+            }
+        }
+
+        function logout() {
+            const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user_info');
+            if (user.role === 'government_admin') {
+                window.location.href = '/login-government';
+            } else {
+                window.location.href = '/login-college';
+            }
+        }
+
+        // Auto refresh alerts
+        function startAutoRefresh() {
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    loadAlerts();
+                }
+            }, 60000); // Refresh every minute
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkAuthentication()) {
+                loadAlerts();
+                startAutoRefresh();
+            }
+        });
+    </script>
+</body>
+</html>

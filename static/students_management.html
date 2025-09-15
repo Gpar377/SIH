@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Students Management - EduAlert</title>
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --rajasthan-orange: #ea580c;
+            --light-blue: #eff6ff;
+            --success-green: #16a34a;
+            --danger-red: #dc2626;
+            --warning-yellow: #d97706;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #d1d5db;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--bg-primary);
+            border-bottom: 2px solid var(--primary-blue);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo-text .logo-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .logout-btn {
+            background: var(--danger-red);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+        }
+
+        .nav-menu-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            padding: 1rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .page-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* Filters Section */
+        .filters-section {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .filters-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .filters-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .clear-filters {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-size: 0.875rem;
+            cursor: pointer;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .filter-input {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgb(30 64 175 / 0.1);
+        }
+
+        /* Search Bar */
+        .search-section {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            background: var(--bg-primary);
+            font-size: 1rem;
+            position: relative;
+        }
+
+        .search-container {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+        }
+
+        /* Students Table */
+        .students-container {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .table-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .table-stats {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .students-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .students-table th {
+            background: var(--bg-secondary);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .students-table td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+            vertical-align: middle;
+        }
+
+        .students-table tr:hover {
+            background: var(--bg-secondary);
+        }
+
+        /* Risk Badges */
+        .risk-badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .risk-low {
+            background: #dcfce7;
+            color: var(--success-green);
+        }
+
+        .risk-medium {
+            background: #fef3c7;
+            color: var(--warning-yellow);
+        }
+
+        .risk-high {
+            background: #fee2e2;
+            color: var(--danger-red);
+        }
+
+        .risk-critical {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        /* Student Actions */
+        .student-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .action-btn {
+            padding: 0.375rem 0.75rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .action-btn.danger:hover {
+            background: var(--danger-red);
+            border-color: var(--danger-red);
+        }
+
+        /* Pagination */
+        .pagination {
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .pagination-info {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .pagination-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .page-btn {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .page-btn.active {
+            background: var(--primary-blue);
+            color: white;
+            border-color: var(--primary-blue);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .modal {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-input {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgb(30 64 175 / 0.1);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 1.5rem;
+        }
+
+        .btn-cancel {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cancel:hover {
+            background: var(--border-color);
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-container,
+            .nav-menu-container,
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .students-table {
+                font-size: 0.75rem;
+            }
+            
+            .students-table th,
+            .students-table td {
+                padding: 0.75rem 0.5rem;
+            }
+            
+            .student-actions {
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="/static/logo.jpg" alt="EduAlert Logo">
+                </div>
+                <div class="logo-text">
+                    <div class="logo-title">EduAlert</div>
+                    <div class="logo-subtitle">Students Management</div>
+                </div>
+            </div>
+            
+            <div class="nav-actions">
+                <div class="user-info">
+                    <span id="userWelcome">Loading...</span>
+                    <span class="user-badge" id="userRole">USER</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+        <div class="nav-menu-container">
+            <a href="/dashboard" class="nav-item">Dashboard</a>
+            <a href="/students" class="nav-item active">Students</a>
+            <a href="/upload" class="nav-item">Upload Data</a>
+            <a href="/alerts" class="nav-item">Alerts</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Students Management</h1>
+                <p class="page-subtitle">Monitor, edit, and manage student data and risk levels</p>
+            </div>
+            
+            <div class="page-actions">
+                <a href="/upload" class="btn-secondary">Upload Students</a>
+                <button class="btn-primary" onclick="exportStudents()">Export Data</button>
+            </div>
+        </div>
+
+        <!-- Filters Section -->
+        <div class="filters-section">
+            <div class="filters-header">
+                <h3 class="filters-title">Filters & Search</h3>
+                <a class="clear-filters" onclick="clearFilters()">Clear All</a>
+            </div>
+            
+            <div class="search-section">
+                <div class="search-container">
+                    <input type="text" class="search-input" placeholder="Search students by name, ID, or department..." id="searchInput">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <button class="btn-primary" onclick="searchStudents()">Search</button>
+            </div>
+            
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Risk Level</label>
+                    <select class="filter-input" id="riskFilter">
+                        <option value="">All Risk Levels</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Department</label>
+                    <select class="filter-input" id="departmentFilter">
+                        <option value="">All Departments</option>
+                        <option value="computer-science">Computer Science</option>
+                        <option value="mechanical">Mechanical</option>
+                        <option value="electrical">Electrical</option>
+                        <option value="civil">Civil</option>
+                        <option value="electronics">Electronics</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Attendance Range</label>
+                    <select class="filter-input" id="attendanceFilter">
+                        <option value="">All Attendance</option>
+                        <option value="0-40">0% - 40%</option>
+                        <option value="40-60">40% - 60%</option>
+                        <option value="60-80">60% - 80%</option>
+                        <option value="80-100">80% - 100%</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label class="filter-label">Semester</label>
+                    <select class="filter-input" id="semesterFilter">
+                        <option value="">All Semesters</option>
+                        <option value="1">Semester 1</option>
+                        <option value="2">Semester 2</option>
+                        <option value="3">Semester 3</option>
+                        <option value="4">Semester 4</option>
+                        <option value="5">Semester 5</option>
+                        <option value="6">Semester 6</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <span>Loading students data...</span>
+        </div>
+
+        <!-- Students Table -->
+        <div id="studentsContainer" class="students-container" style="display: none;">
+            <div class="table-header">
+                <h3 class="table-title">Students List</h3>
+                <div class="table-stats" id="tableStats">Loading...</div>
+            </div>
+            
+            <table class="students-table">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                        </th>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Semester</th>
+                        <th>Attendance</th>
+                        <th>Marks</th>
+                        <th>Risk Level</th>
+                        <th>Risk Score</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="studentsTableBody">
+                    <!-- Students will be populated here -->
+                </tbody>
+            </table>
+            
+            <div class="pagination">
+                <div class="pagination-info" id="paginationInfo">
+                    Showing 0 of 0 students
+                </div>
+                <div class="pagination-controls" id="paginationControls">
+                    <!-- Pagination buttons will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="empty-state" style="display: none;">
+            <div class="empty-icon">📚</div>
+            <h3>No Students Found</h3>
+            <p>Upload student data or adjust your filters to see results.</p>
+            <a href="/upload" class="btn-primary" style="margin-top: 1rem;">Upload Students</a>
+        </div>
+    </div>
+
+    <!-- Edit Student Modal -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Edit Student</h3>
+            </div>
+            <form class="modal-form" id="editForm">
+                <div class="form-group">
+                    <label class="form-label">Student Name</label>
+                    <input type="text" class="form-input" id="editName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Attendance Percentage</label>
+                    <input type="number" class="form-input" id="editAttendance" min="0" max="100" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Marks</label>
+                    <input type="number" class="form-input" id="editMarks" min="0" max="100" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Family Income</label>
+                    <input type="number" class="form-input" id="editIncome" min="0">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Distance from College (km)</label>
+                    <input type="number" class="form-input" id="editDistance" min="0">
+                </div>
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.875rem; border-top: 1px solid var(--border-color); margin-top: 2rem;">
+        Made with ❤️
+    </footer>
+
+    <script>
+        // Configuration
+        const API_BASE = window.location.origin;
+        let studentsData = [];
+        let filteredStudents = [];
+        let currentPage = 1;
+        let itemsPerPage = 20;
+        let selectedStudents = new Set();
+        let currentEditingStudent = null;
+
+        // Check authentication and setup UI
+        function checkAuthentication() {
+            const token = localStorage.getItem('access_token');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (!token || !userInfo) {
+                window.location.href = '/login-government';
+                return false;
+            }
+            
+            try {
+                const user = JSON.parse(userInfo);
+                document.getElementById('userWelcome').textContent = `Welcome, ${user.username}`;
+                document.getElementById('userRole').textContent = user.role.toUpperCase();
+                
+                // Setup navigation based on role
+                setupNavigation(user);
+                
+                return true;
+            } catch (e) {
+                logout();
+                return false;
+            }
+        }
+
+        // Setup navigation based on user role
+        function setupNavigation(user) {
+            // Add college selector for government users
+            if (user.role === 'government_admin') {
+                const navbar = document.querySelector('.navbar-container');
+                const navCenter = document.createElement('div');
+                navCenter.style.cssText = 'display: flex; align-items: center; gap: 2rem; flex: 1; justify-content: center;';
+                
+                navCenter.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 1rem; background: var(--bg-secondary); padding: 0.75rem 1.25rem; border-radius: 0.5rem; border: 2px solid var(--border-color);">
+                        <span style="color: var(--text-primary); font-weight: 600; font-size: 0.875rem; white-space: nowrap;">Filter by College:</span>
+                        <select id="collegeFilter" style="padding: 0.5rem 1rem; border: 1px solid var(--border-color); border-radius: 0.375rem; background: white; color: var(--text-primary); font-size: 0.875rem; font-weight: 500; cursor: pointer; min-width: 250px;" onchange="applyFilters()">
+                            <option value="">All Colleges</option>
+                            <option value="gpj">Government Polytechnic Jaipur</option>
+                            <option value="geca">Government Engineering College Ajmer</option>
+                            <option value="rtu">Rajasthan Technical University Kota</option>
+                            <option value="itij">Industrial Training Institute Jaipur</option>
+                            <option value="polu">Polytechnic College Udaipur</option>
+                        </select>
+                    </div>
+                `;
+                
+                // Insert between logo and nav actions
+                navbar.insertBefore(navCenter, navbar.lastElementChild);
+                
+                // Update page title
+                document.querySelector('.page-title').textContent = 'All Students Management';
+                document.querySelector('.page-subtitle').textContent = 'Monitor, edit, and manage students across all colleges';
+            } else {
+                // College user - update title to reflect their college
+                const collegeName = getCollegeName(user.college_id);
+                document.querySelector('.page-title').textContent = `${collegeName} - Students`;
+                document.querySelector('.page-subtitle').textContent = 'Monitor, edit, and manage your college students';
+                
+                // Hide upload option for college users (optional)
+                // const uploadBtn = document.querySelector('a[href="/upload"]');
+                // if (uploadBtn) uploadBtn.style.display = 'none';
+            }
+        }
+
+        // Get college name from code
+        function getCollegeName(collegeId) {
+            const collegeNames = {
+                'gpj': 'Government Polytechnic Jaipur',
+                'geca': 'Government Engineering College Ajmer',
+                'rtu': 'Rajasthan Technical University Kota',
+                'itij': 'Industrial Training Institute Jaipur',
+                'polu': 'Polytechnic College Udaipur'
+            };
+            return collegeNames[collegeId] || collegeId.toUpperCase();
+        }
+
+        // Modified API call to include college filtering
+        async function apiCall(endpoint, options = {}) {
+            const token = localStorage.getItem('access_token');
+            const user = JSON.parse(localStorage.getItem('user_info'));
+            
+            let finalEndpoint = endpoint;
+            
+            // Add college filtering for API calls
+            if (user.role === 'government_admin') {
+                const collegeFilter = document.getElementById('collegeFilter');
+                if (collegeFilter && collegeFilter.value) {
+                    const separator = endpoint.includes('?') ? '&' : '?';
+                    finalEndpoint = `${endpoint}${separator}college=${collegeFilter.value}`;
+                }
+            }
+            // College users automatically get their college data via backend auth
+            
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}${finalEndpoint}`, {
+                    ...options,
+                    ...defaultOptions
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return null;
+                }
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+        // Load students data with role-based filtering
+        async function loadStudents() {
+            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('studentsContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'none';
+
+            try {
+                const data = await apiCall('/api/students?limit=1000');
+                
+                if (!data || !data.students) {
+                    // Generate mock data based on user role
+                    const user = JSON.parse(localStorage.getItem('user_info'));
+                    studentsData = generateMockStudents(user);
+                } else {
+                    studentsData = data.students;
+                }
+                
+                filteredStudents = [...studentsData];
+                
+                if (filteredStudents.length === 0) {
+                    showEmptyState();
+                } else {
+                    updateTable();
+                    document.getElementById('loadingState').style.display = 'none';
+                    document.getElementById('studentsContainer').style.display = 'block';
+                }
+                
+            } catch (error) {
+                console.error('Failed to load students:', error);
+                // Fallback to mock data
+                const user = JSON.parse(localStorage.getItem('user_info'));
+                studentsData = generateMockStudents(user);
+                filteredStudents = [...studentsData];
+                updateTable();
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('studentsContainer').style.display = 'block';
+            }
+        }
+
+        // Generate mock students based on user role with realistic data from sample files
+        function generateMockStudents(user) {
+            const gpjStudents = [
+                { student_id: 'GPJ2024001', name: 'Priya Bansal', college: 'gpj', department: 'Computer Engineering', semester: 3, attendance_percentage: 44, marks: 32, fees_due: 23618, payment_status: 'Pending', risk_level: 'critical', risk_score: 88 },
+                { student_id: 'GPJ2024003', name: 'Vikash Choudhary', college: 'gpj', department: 'Computer Engineering', semester: 2, attendance_percentage: 66, marks: 75, fees_due: 8607, payment_status: 'Paid', risk_level: 'medium', risk_score: 45 },
+                { student_id: 'GPJ2024007', name: 'Ishaan Jain', college: 'gpj', department: 'Electrical Engineering', semester: 4, attendance_percentage: 39, marks: 48, fees_due: 23334, payment_status: 'Paid', risk_level: 'critical', risk_score: 85 },
+                { student_id: 'GPJ2024015', name: 'Sai Mathur', college: 'gpj', department: 'Computer Engineering', semester: 3, attendance_percentage: 96, marks: 84, fees_due: 616, payment_status: 'Paid', risk_level: 'low', risk_score: 15 },
+                { student_id: 'GPJ2024026', name: 'Ajay Tiwari', college: 'gpj', department: 'Electrical Engineering', semester: 2, attendance_percentage: 35, marks: 52, fees_due: 20092, payment_status: 'Paid', risk_level: 'critical', risk_score: 92 }
+            ];
+            
+            const gecaStudents = [
+                { student_id: 'GECA001', name: 'Amit Kumar', college: 'geca', department: 'Electrical Engineering', semester: 4, attendance_percentage: 82, marks: 73, fees_due: 5000, payment_status: 'Paid', risk_level: 'low', risk_score: 25 },
+                { student_id: 'GECA002', name: 'Sneha Singh', college: 'geca', department: 'Civil Engineering', semester: 3, attendance_percentage: 65, marks: 58, fees_due: 15000, payment_status: 'Pending', risk_level: 'high', risk_score: 72 }
+            ];
+            
+            const rtuStudents = [
+                { student_id: 'RTU001', name: 'Vikash Gupta', college: 'rtu', department: 'Computer Science', semester: 5, attendance_percentage: 88, marks: 85, fees_due: 2000, payment_status: 'Paid', risk_level: 'low', risk_score: 15 },
+                { student_id: 'RTU002', name: 'Pooja Jain', college: 'rtu', department: 'Electronics', semester: 4, attendance_percentage: 55, marks: 48, fees_due: 25000, payment_status: 'Pending', risk_level: 'high', risk_score: 68 }
+            ];
+            
+            const itijStudents = [
+                { student_id: 'ITIJ001', name: 'Rajesh Meena', college: 'itij', department: 'Mechanical', semester: 2, attendance_percentage: 92, marks: 88, fees_due: 1000, payment_status: 'Paid', risk_level: 'low', risk_score: 12 }
+            ];
+            
+            const poluStudents = [
+                { student_id: 'POLU001', name: 'Kavita Sharma', college: 'polu', department: 'Civil', semester: 3, attendance_percentage: 38, marks: 35, fees_due: 30000, payment_status: 'Pending', risk_level: 'critical', risk_score: 92 }
+            ];
+
+            const allStudents = [...gpjStudents, ...gecaStudents, ...rtuStudents, ...itijStudents, ...poluStudents];
+
+            if (user.role === 'government_admin') {
+                return allStudents; // Government sees all students
+            } else {
+                return allStudents.filter(s => s.college === user.college_id); // College sees only their students
+            }
+        }
+
+        // Modified apply filters to include college filter for government users
+        function applyFilters() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const riskFilter = document.getElementById('riskFilter').value;
+            const departmentFilter = document.getElementById('departmentFilter').value;
+            const attendanceFilter = document.getElementById('attendanceFilter').value;
+            const semesterFilter = document.getElementById('semesterFilter').value;
+            
+            // Get college filter for government users
+            const user = JSON.parse(localStorage.getItem('user_info'));
+            let collegeFilter = '';
+            if (user.role === 'government_admin') {
+                const collegeSelect = document.getElementById('collegeFilter');
+                if (collegeSelect) {
+                    collegeFilter = collegeSelect.value;
+                }
+            }
+            
+            filteredStudents = studentsData.filter(student => {
+                // Search filter
+                const matchesSearch = !searchTerm || 
+                    (student.name && student.name.toLowerCase().includes(searchTerm)) ||
+                    (student.student_id && student.student_id.toLowerCase().includes(searchTerm)) ||
+                    (student.department && student.department.toLowerCase().includes(searchTerm));
+                
+                // Risk filter
+                const matchesRisk = !riskFilter || 
+                    (student.risk_level && student.risk_level.toLowerCase() === riskFilter);
+                
+                // Department filter
+                const matchesDepartment = !departmentFilter || 
+                    (student.department && student.department.toLowerCase().replace(/\s+/g, '-') === departmentFilter);
+                
+                // Attendance filter
+                const matchesAttendance = !attendanceFilter || (() => {
+                    const attendance = student.attendance_percentage || 0;
+                    const [min, max] = attendanceFilter.split('-').map(Number);
+                    return attendance >= min && attendance <= max;
+                })();
+                
+                // Semester filter
+                const matchesSemester = !semesterFilter || 
+                    (student.semester && student.semester.toString() === semesterFilter);
+                
+                // College filter (government users only)
+                const matchesCollege = !collegeFilter || 
+                    (student.college && student.college === collegeFilter);
+                
+                return matchesSearch && matchesRisk && matchesDepartment && matchesAttendance && matchesSemester && matchesCollege;
+            });
+            
+            currentPage = 1;
+            updateTable();
+        }
+
+        // Updated table to show college column for government users
+        function updateTable() {
+            const tbody = document.getElementById('studentsTableBody');
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = startIndex + itemsPerPage;
+            const currentPageStudents = filteredStudents.slice(startIndex, endIndex);
+            const user = JSON.parse(localStorage.getItem('user_info'));
+            
+            // Add college column for government users
+            const collegeColumn = user.role === 'government_admin' ? 
+                '<th>College</th>' : '';
+            
+            // Update table header if needed
+            const tableHeader = document.querySelector('.students-table thead tr');
+            if (user.role === 'government_admin' && !tableHeader.querySelector('th[data-college]')) {
+                const collegeHeader = document.createElement('th');
+                collegeHeader.setAttribute('data-college', 'true');
+                collegeHeader.textContent = 'College';
+                tableHeader.insertBefore(collegeHeader, tableHeader.children[3]); // Insert after Name
+            }
+            
+            tbody.innerHTML = currentPageStudents.map(student => `
+                <tr>
+                    <td>
+                        <input type="checkbox" value="${student.student_id}" onchange="toggleStudentSelection('${student.student_id}')">
+                    </td>
+                    <td>${student.student_id || 'N/A'}</td>
+                    <td>${student.name || 'N/A'}</td>
+                    ${user.role === 'government_admin' ? `<td>${getCollegeName(student.college || '')}</td>` : ''}
+                    <td>${student.department || 'N/A'}</td>
+                    <td>${student.semester || 'N/A'}</td>
+                    <td>${student.attendance_percentage || 0}%</td>
+                    <td>${student.marks || student.theory_marks || 0}</td>
+                    <td>
+                        <span class="risk-badge risk-${(student.risk_level || 'low').toLowerCase()}">
+                            ${(student.risk_level || 'Low').toUpperCase()}
+                        </span>
+                    </td>
+                    <td>${student.risk_score || 0}</td>
+                    <td>
+                        <div class="student-actions">
+                            <button class="action-btn" onclick="viewStudent('${student.student_id}')">View</button>
+                            <button class="action-btn" onclick="editStudent('${student.student_id}')">Edit</button>
+                            <button class="action-btn danger" onclick="deleteStudent('${student.student_id}')">Delete</button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+            
+            updateTableStats();
+            updatePagination();
+        }
+
+        // Missing function - Update table statistics
+        function updateTableStats() {
+            const statsElement = document.getElementById('tableStats');
+            const total = filteredStudents.length;
+            const showing = Math.min(itemsPerPage, total - (currentPage - 1) * itemsPerPage);
+            const start = total > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
+            const end = Math.min(currentPage * itemsPerPage, total);
+            
+            if (statsElement) {
+                statsElement.textContent = `Showing ${start}-${end} of ${total} students`;
+            }
+        }
+
+        // Missing function - Update pagination
+        function updatePagination() {
+            const paginationInfo = document.getElementById('paginationInfo');
+            const paginationControls = document.getElementById('paginationControls');
+            const total = filteredStudents.length;
+            const totalPages = Math.ceil(total / itemsPerPage);
+            
+            if (paginationInfo) {
+                paginationInfo.textContent = `Showing ${Math.min((currentPage - 1) * itemsPerPage + 1, total)}-${Math.min(currentPage * itemsPerPage, total)} of ${total} students`;
+            }
+            
+            if (paginationControls) {
+                let paginationHTML = '';
+                
+                // Previous button
+                paginationHTML += `<button class="page-btn" ${currentPage <= 1 ? 'disabled' : ''} onclick="changePage(${currentPage - 1})">Previous</button>`;
+                
+                // Page numbers
+                for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) {
+                    paginationHTML += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="changePage(${i})">${i}</button>`;
+                }
+                
+                // Next button
+                paginationHTML += `<button class="page-btn" ${currentPage >= totalPages ? 'disabled' : ''} onclick="changePage(${currentPage + 1})">Next</button>`;
+                
+                paginationControls.innerHTML = paginationHTML;
+            }
+        }
+
+        // Missing function - Change page
+        function changePage(page) {
+            const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+            if (page >= 1 && page <= totalPages) {
+                currentPage = page;
+                updateTable();
+            }
+        }
+
+        // Missing function - Toggle student selection
+        function toggleStudentSelection(studentId) {
+            if (selectedStudents.has(studentId)) {
+                selectedStudents.delete(studentId);
+            } else {
+                selectedStudents.add(studentId);
+            }
+        }
+
+        // Missing function - Toggle select all
+        function toggleSelectAll() {
+            const selectAllCheckbox = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAllCheckbox.checked;
+                const studentId = checkbox.value;
+                if (selectAllCheckbox.checked) {
+                    selectedStudents.add(studentId);
+                } else {
+                    selectedStudents.delete(studentId);
+                }
+            });
+        }
+
+        // Missing function - Clear filters
+        function clearFilters() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('riskFilter').value = '';
+            document.getElementById('departmentFilter').value = '';
+            document.getElementById('attendanceFilter').value = '';
+            document.getElementById('semesterFilter').value = '';
+            
+            const collegeFilter = document.getElementById('collegeFilter');
+            if (collegeFilter) collegeFilter.value = '';
+            
+            applyFilters();
+        }
+
+        // Missing function - Search students
+        function searchStudents() {
+            applyFilters();
+        }
+
+        // Missing function - View student
+        function viewStudent(studentId) {
+            alert(`Viewing student: ${studentId}`);
+        }
+
+        // Missing function - Edit student
+        function editStudent(studentId) {
+            const student = studentsData.find(s => s.student_id === studentId);
+            if (!student) return;
+            
+            currentEditingStudent = studentId;
+            document.getElementById('editName').value = student.name || '';
+            document.getElementById('editAttendance').value = student.attendance_percentage || '';
+            document.getElementById('editMarks').value = student.marks || student.theory_marks || '';
+            document.getElementById('editIncome').value = student.family_income || '';
+            document.getElementById('editDistance').value = student.distance_from_college || '';
+            
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        // Missing function - Delete student
+        function deleteStudent(studentId) {
+            if (confirm(`Are you sure you want to delete student ${studentId}?`)) {
+                alert(`Delete functionality not implemented for: ${studentId}`);
+            }
+        }
+
+        // Missing function - Close modal
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+            currentEditingStudent = null;
+        }
+
+        // Missing function - Export students
+        function exportStudents() {
+            alert('Export functionality not implemented');
+        }
+
+        // Missing function - Show empty state
+        function showEmptyState() {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('studentsContainer').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+        }
+
+        function logout() {
+            const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user_info');
+            if (user.role === 'government_admin') {
+                window.location.href = '/login-government';
+            } else {
+                window.location.href = '/login-college';
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkAuthentication()) {
+                loadStudents();
+            }
+            
+            // Add real-time search
+            document.getElementById('searchInput').addEventListener('input', debounce(applyFilters, 300));
+            
+            // Add filter change listeners
+            ['riskFilter', 'departmentFilter', 'attendanceFilter', 'semesterFilter'].forEach(filterId => {
+                document.getElementById(filterId).addEventListener('change', applyFilters);
+            });
+            
+            // Edit form submission
+            document.getElementById('editForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                if (!currentEditingStudent) return;
+                
+                const formData = {
+                    attendance_percentage: parseFloat(document.getElementById('editAttendance').value),
+                    marks: parseFloat(document.getElementById('editMarks').value),
+                    family_income: parseInt(document.getElementById('editIncome').value),
+                    distance_from_college: parseInt(document.getElementById('editDistance').value)
+                };
+                
+                try {
+                    const result = await apiCall(`/api/student/${currentEditingStudent}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    if (result && result.success) {
+                        alert('Student updated successfully!');
+                        closeModal();
+                        loadStudents(); // Reload data
+                    } else {
+                        throw new Error('Update failed');
+                    }
+                } catch (error) {
+                    console.error('Failed to update student:', error);
+                    alert('Failed to update student. Please try again.');
+                }
+            });
+        });
+
+        // Utility function for debouncing
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Handle browser back button
+        window.addEventListener('popstate', () => {
+            if (checkAuthentication()) {
+                loadStudents();
+            }
+        });
+    </script>
+</body>
+</html>

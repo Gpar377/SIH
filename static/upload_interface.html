@@ -1,0 +1,1476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Student Data - EduAlert</title>
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --rajasthan-orange: #ea580c;
+            --light-blue: #eff6ff;
+            --success-green: #16a34a;
+            --danger-red: #dc2626;
+            --warning-yellow: #d97706;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #d1d5db;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--bg-primary);
+            border-bottom: 2px solid var(--primary-blue);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo-text .logo-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-badge {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .logout-btn {
+            background: var(--danger-red);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+        }
+
+        .nav-menu-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            padding: 1rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        /* Main Container */
+        .main-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.125rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Upload Steps */
+        .upload-steps {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 3rem;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .step-number {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            background: var(--border-color);
+        }
+
+        .step.active .step-number {
+            background: var(--primary-blue);
+        }
+
+        .step.completed .step-number {
+            background: var(--success-green);
+        }
+
+        .step-label {
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .step.active .step-label {
+            color: var(--primary-blue);
+        }
+
+        .step-arrow {
+            margin: 0 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Upload Section */
+        .upload-section {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+        }
+
+        .drag-drop-zone {
+            border: 3px dashed var(--border-color);
+            border-radius: 1rem;
+            padding: 4rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background: var(--bg-secondary);
+        }
+
+        .drag-drop-zone.dragover {
+            border-color: var(--primary-blue);
+            background: var(--light-blue);
+            transform: scale(1.02);
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .upload-btn {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 1rem;
+        }
+
+        .upload-btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-1px);
+        }
+
+        .supported-formats {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        /* File Preview */
+        .file-preview {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .file-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-icon {
+            width: 3rem;
+            height: 3rem;
+            background: var(--light-blue);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--primary-blue);
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .file-stats {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        .change-file {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .change-file:hover {
+            text-decoration: underline;
+        }
+
+        /* Sample Data Table */
+        .sample-table {
+            overflow-x: auto;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .sample-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .sample-table th,
+        .sample-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.875rem;
+        }
+
+        .sample-table th {
+            background: var(--bg-secondary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* Column Mapping */
+        .mapping-section {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            display: none;
+        }
+
+        .mapping-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .mapping-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .mapping-subtitle {
+            color: var(--text-secondary);
+        }
+
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .required-fields {
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+        }
+
+        .fields-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .field-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .field-item:last-child {
+            border-bottom: none;
+        }
+
+        .field-name {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .field-status {
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .status-required {
+            background: #fee2e2;
+            color: var(--danger-red);
+        }
+
+        .status-optional {
+            background: #e0e7ff;
+            color: var(--primary-blue);
+        }
+
+        .status-mapped {
+            background: #dcfce7;
+            color: var(--success-green);
+        }
+
+        .mapping-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .mapping-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .user-column {
+            background: var(--bg-secondary);
+            padding: 0.75rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+
+        .arrow {
+            color: var(--text-secondary);
+        }
+
+        .system-select {
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        .system-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgb(30 64 175 / 0.1);
+        }
+
+        /* Process Section */
+        .process-section {
+            text-align: center;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .process-btn {
+            background: var(--success-green);
+            color: white;
+            border: none;
+            padding: 1rem 3rem;
+            border-radius: 0.5rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .process-btn:hover {
+            background: #15803d;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .process-btn:disabled {
+            background: var(--border-color);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Processing State */
+        .processing {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .processing-icon {
+            width: 4rem;
+            height: 4rem;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 2rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .processing-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .processing-subtitle {
+            color: var(--text-secondary);
+        }
+
+        /* Success State */
+        .success-section {
+            background: var(--bg-primary);
+            border-radius: 1rem;
+            padding: 3rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            display: none;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: var(--success-green);
+            margin-bottom: 1rem;
+        }
+
+        .success-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .success-subtitle {
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+
+        .success-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .stat-item {
+            background: var(--bg-secondary);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .success-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .btn-secondary {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+        }
+
+        /* Error State */
+        .error-section {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 1rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .error-title {
+            color: var(--danger-red);
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .error-message {
+            color: var(--danger-red);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .upload-section {
+                padding: 2rem 1rem;
+            }
+            
+            .mapping-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .upload-steps {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .step-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="/static/logo.jpg" alt="EduAlert Logo">
+                </div>
+                <div class="logo-text">
+                    <div class="logo-title">EduAlert</div>
+                    <div class="logo-subtitle">Data Upload Portal</div>
+                </div>
+            </div>
+            
+            <div class="nav-actions">
+                <div class="user-info">
+                    <span id="userWelcome">Loading...</span>
+                    <span class="user-badge" id="userRole">USER</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+        <div class="nav-menu-container">
+            <a href="/dashboard" class="nav-item">Dashboard</a>
+            <a href="/students" class="nav-item">Students</a>
+            <a href="/upload" class="nav-item active">Upload Data</a>
+            <a href="/alerts" class="nav-item">Alerts</a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Page Header -->
+        <div class="page-header">
+            <h1 class="page-title">Upload Student Data</h1>
+            <p class="page-subtitle">Upload CSV or Excel files containing student information for risk analysis and dropout prediction</p>
+        </div>
+
+        <!-- Upload Steps -->
+        <div class="upload-steps">
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-label">Upload File</div>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-label">Map Columns</div>
+            </div>
+            <div class="step-arrow">→</div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-label">Process Data</div>
+            </div>
+        </div>
+
+        <!-- Upload Options -->
+        <div class="upload-options" style="display: flex; gap: 2rem; margin-bottom: 2rem; justify-content: center;">
+            <button class="upload-btn" onclick="showSingleUpload()" id="singleUploadBtn" style="background: var(--primary-blue);">Single File Upload</button>
+            <button class="upload-btn" onclick="showMultiUpload()" id="multiUploadBtn" style="background: var(--rajasthan-orange);">Multi-File Upload (SIH)</button>
+        </div>
+
+        <!-- Single File Upload Section -->
+        <div class="upload-section" id="uploadSection">
+            <div class="drag-drop-zone" id="dragDropZone">
+                <div class="upload-icon">📁</div>
+                <h3 class="upload-title">Drag & Drop Your File Here</h3>
+                <p class="upload-subtitle">Or click the button below to browse for files</p>
+                <button class="upload-btn" onclick="document.getElementById('fileInput').click()">Choose File</button>
+                <p class="supported-formats">Supported formats: CSV, Excel (.xlsx, .xls)</p>
+                <input type="file" id="fileInput" class="file-input" accept=".csv,.xlsx,.xls">
+            </div>
+        </div>
+
+        <!-- Multi-File Upload Section -->
+        <div class="upload-section" id="multiUploadSection" style="display: none;">
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <h3 style="color: var(--rajasthan-orange); margin-bottom: 1rem;">📊 SIH Multi-File Upload</h3>
+                <p style="color: var(--text-secondary);">Upload 3 separate files: Attendance, Marks, and Fees data</p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <!-- Attendance File -->
+                <div class="file-upload-card" style="border: 2px solid var(--border-color); border-radius: 1rem; padding: 2rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📅</div>
+                    <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Attendance Data</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">student_id, attendance_percentage</p>
+                    <button class="upload-btn" onclick="document.getElementById('attendanceInput').click()" style="width: 100%; margin-bottom: 1rem;">Choose Attendance File</button>
+                    <input type="file" id="attendanceInput" class="file-input" accept=".csv,.xlsx,.xls">
+                    <div id="attendanceStatus" style="font-size: 0.875rem; color: var(--text-secondary);">No file selected</div>
+                </div>
+
+                <!-- Marks File -->
+                <div class="file-upload-card" style="border: 2px solid var(--border-color); border-radius: 1rem; padding: 2rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">📝</div>
+                    <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Marks Data</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">student_id, marks</p>
+                    <button class="upload-btn" onclick="document.getElementById('marksInput').click()" style="width: 100%; margin-bottom: 1rem;">Choose Marks File</button>
+                    <input type="file" id="marksInput" class="file-input" accept=".csv,.xlsx,.xls">
+                    <div id="marksStatus" style="font-size: 0.875rem; color: var(--text-secondary);">No file selected</div>
+                </div>
+
+                <!-- Fees File -->
+                <div class="file-upload-card" style="border: 2px solid var(--border-color); border-radius: 1rem; padding: 2rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">💰</div>
+                    <h4 style="color: var(--text-primary); margin-bottom: 0.5rem;">Fees Data</h4>
+                    <p style="color: var(--text-secondary); font-size: 0.875rem; margin-bottom: 1rem;">student_id, fees_due, payment_status</p>
+                    <button class="upload-btn" onclick="document.getElementById('feesInput').click()" style="width: 100%; margin-bottom: 1rem;">Choose Fees File</button>
+                    <input type="file" id="feesInput" class="file-input" accept=".csv,.xlsx,.xls">
+                    <div id="feesStatus" style="font-size: 0.875rem; color: var(--text-secondary);">No file selected</div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button class="process-btn" id="multiProcessBtn" onclick="processMultiFiles()" disabled style="background: var(--rajasthan-orange);">Process 3 Files</button>
+            </div>
+        </div>
+
+        <!-- File Preview -->
+        <div class="file-preview" id="filePreview">
+            <div class="file-info">
+                <div class="file-details">
+                    <div class="file-icon">📄</div>
+                    <div>
+                        <div class="file-name" id="fileName">filename.csv</div>
+                        <div class="file-stats" id="fileStats">0 rows, 0 columns</div>
+                    </div>
+                </div>
+                <a class="change-file" onclick="changeFile()">Change File</a>
+            </div>
+            
+            <h4 style="margin-bottom: 1rem; color: var(--text-primary);">Sample Data Preview</h4>
+            <div class="sample-table" id="sampleTable">
+                <!-- Table will be populated dynamically -->
+            </div>
+        </div>
+
+        <!-- Column Mapping -->
+        <div class="mapping-section" id="mappingSection">
+            <div class="mapping-header">
+                <h3 class="mapping-title">Map Your Columns</h3>
+                <p class="mapping-subtitle">Match your file columns to our system fields</p>
+            </div>
+            
+            <div class="mapping-grid">
+                <div class="required-fields">
+                    <h4 class="fields-title">System Fields</h4>
+                    <div id="systemFields">
+                        <!-- System fields will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="mapping-controls" id="mappingControls">
+                    <!-- Mapping controls will be populated here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Process Section -->
+        <div class="process-section" id="processSection">
+            <button class="process-btn" id="processBtn" onclick="processData()">Process Data</button>
+        </div>
+
+        <!-- Processing State -->
+        <div class="processing" id="processingState">
+            <div class="processing-icon"></div>
+            <h3 class="processing-title">Processing Your Data</h3>
+            <p class="processing-subtitle">Please wait while we analyze and process your student data...</p>
+        </div>
+
+        <!-- Success State -->
+        <div class="success-section" id="successSection">
+            <div class="success-icon">✅</div>
+            <h3 class="success-title">Data Uploaded Successfully!</h3>
+            <p class="success-subtitle">Your student data has been processed and is ready for analysis</p>
+            
+            <div class="success-stats" id="successStats">
+                <!-- Stats will be populated dynamically -->
+            </div>
+            
+            <div class="success-actions">
+                <a href="/students" class="upload-btn">View Students</a>
+                <a href="/dashboard" class="btn-secondary">Go to Dashboard</a>
+                <button class="btn-secondary" onclick="uploadAnother()">Upload Another File</button>
+            </div>
+        </div>
+
+        <!-- Error Section -->
+        <div class="error-section" id="errorSection">
+            <h4 class="error-title">Upload Failed</h4>
+            <p class="error-message" id="errorMessage">An error occurred while processing your file.</p>
+            <button class="upload-btn" onclick="retryUpload()" style="margin-top: 1rem;">Try Again</button>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.875rem; border-top: 1px solid var(--border-color); margin-top: 2rem;">
+        Made with ❤️
+    </footer>
+
+    <script>
+        // Configuration
+        const API_BASE = window.location.origin;
+        let currentFile = null;
+        let fileData = null;
+        let columnMappings = {};
+        let sessionId = null;
+        let multiFiles = {
+            attendance: null,
+            marks: null,
+            fees: null
+        };
+
+        // System fields configuration
+        const SYSTEM_FIELDS = {
+            required: [
+                { key: 'student_id', name: 'Student ID', description: 'Unique identifier for student' },
+                { key: 'name', name: 'Student Name', description: 'Full name of the student' },
+                { key: 'attendance_percentage', name: 'Attendance %', description: '0-100 percentage' },
+                { key: 'marks', name: 'Marks/Grades', description: 'Academic performance score' }
+            ],
+            optional: [
+                { key: 'department', name: 'Department', description: 'Student department/branch' },
+                { key: 'semester', name: 'Semester', description: 'Current semester' },
+                { key: 'family_income', name: 'Family Income', description: 'Annual family income' },
+                { key: 'family_size', name: 'Family Size', description: 'Number of family members' },
+                { key: 'region', name: 'Region', description: 'Urban/Rural location' },
+                { key: 'electricity', name: 'Electricity Access', description: 'Regular/Irregular' },
+                { key: 'internet_access', name: 'Internet Access', description: 'Yes/No' },
+                { key: 'distance_from_college', name: 'Distance from College', description: 'Distance in kilometers' }
+            ]
+        };
+
+        // Authentication check
+        function checkAuthentication() {
+            const token = localStorage.getItem('access_token');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (!token || !userInfo) {
+                window.location.href = '/login';
+                return false;
+            }
+            
+            try {
+                const user = JSON.parse(userInfo);
+                document.getElementById('userWelcome').textContent = `Welcome, ${user.username}`;
+                document.getElementById('userRole').textContent = user.role.toUpperCase();
+                return true;
+            } catch (e) {
+                logout();
+                return false;
+            }
+        }
+
+        // API call with authentication
+        async function apiCall(endpoint, options = {}) {
+            const token = localStorage.getItem('access_token');
+            const defaultHeaders = {
+                'Authorization': `Bearer ${token}`,
+                ...options.headers
+            };
+
+            // Don't set Content-Type for FormData
+            if (!(options.body instanceof FormData)) {
+                defaultHeaders['Content-Type'] = 'application/json';
+            }
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: defaultHeaders
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return null;
+                }
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.detail || `HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                throw error;
+            }
+        }
+
+        // File handling
+        function setupFileHandling() {
+            const dragDropZone = document.getElementById('dragDropZone');
+            const fileInput = document.getElementById('fileInput');
+
+            // Drag and drop handlers
+            dragDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dragDropZone.classList.add('dragover');
+            });
+
+            dragDropZone.addEventListener('dragleave', () => {
+                dragDropZone.classList.remove('dragover');
+            });
+
+            dragDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragDropZone.classList.remove('dragover');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFile(files[0]);
+                }
+            });
+
+            // File input handler
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+
+            // Click handler for drag zone
+            dragDropZone.addEventListener('click', () => {
+                fileInput.click();
+            });
+        }
+
+        // Handle file selection
+        async function handleFile(file) {
+            // Validate file type
+            const allowedTypes = ['.csv', '.xlsx', '.xls'];
+            const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+            
+            if (!allowedTypes.includes(fileExtension)) {
+                showError('Invalid file type. Please upload CSV or Excel files only.');
+                return;
+            }
+
+            // Validate file size (max 10MB)
+            if (file.size > 10 * 1024 * 1024) {
+                showError('File too large. Please upload files smaller than 10MB.');
+                return;
+            }
+
+            currentFile = file;
+            await uploadFile();
+        }
+
+        // Upload file to server
+        async function uploadFile() {
+            try {
+                const formData = new FormData();
+                formData.append('file', currentFile);
+
+                showLoading('Analyzing file...');
+
+                const result = await apiCall('/api/upload-file', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!result) {
+                    throw new Error('No response from server');
+                }
+
+                fileData = result;
+                sessionId = result.session_id;
+                
+                showFilePreview();
+                showColumnMapping();
+                updateStep(2);
+
+            } catch (error) {
+                console.error('Upload failed:', error);
+                showError(error.message || 'Failed to upload file');
+            }
+        }
+
+        // Show file preview
+        function showFilePreview() {
+            const preview = document.getElementById('filePreview');
+            const fileName = document.getElementById('fileName');
+            const fileStats = document.getElementById('fileStats');
+            const sampleTable = document.getElementById('sampleTable');
+
+            fileName.textContent = fileData.filename;
+            fileStats.textContent = `${fileData.total_rows} rows, ${Object.keys(fileData.column_info.user_columns).length} columns`;
+
+            // Create sample data table
+            if (fileData.sample_data && fileData.sample_data.length > 0) {
+                const headers = Object.keys(fileData.sample_data[0]);
+                
+                sampleTable.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                ${headers.map(header => `<th>${header}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${fileData.sample_data.slice(0, 5).map(row => `
+                                <tr>
+                                    ${headers.map(header => `<td>${row[header] || ''}</td>`).join('')}
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            }
+
+            preview.style.display = 'block';
+        }
+
+        // Show column mapping interface
+        function showColumnMapping() {
+            const mappingSection = document.getElementById('mappingSection');
+            const systemFields = document.getElementById('systemFields');
+            const mappingControls = document.getElementById('mappingControls');
+
+            // Populate system fields
+            systemFields.innerHTML = [
+                ...SYSTEM_FIELDS.required.map(field => `
+                    <div class="field-item">
+                        <div>
+                            <div class="field-name">${field.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">${field.description}</div>
+                        </div>
+                        <div class="field-status status-required" id="status-${field.key}">Required</div>
+                    </div>
+                `),
+                ...SYSTEM_FIELDS.optional.map(field => `
+                    <div class="field-item">
+                        <div>
+                            <div class="field-name">${field.name}</div>
+                            <div style="font-size: 0.75rem; color: var(--text-secondary);">${field.description}</div>
+                        </div>
+                        <div class="field-status status-optional" id="status-${field.key}">Optional</div>
+                    </div>
+                `)
+            ].join('');
+
+            // Populate mapping controls
+            const userColumns = fileData.column_info.user_columns;
+            const suggestions = fileData.column_info.suggestions || {};
+
+            mappingControls.innerHTML = userColumns.map(column => `
+                <div class="mapping-row">
+                    <div class="user-column">${column}</div>
+                    <div class="arrow">→</div>
+                    <select class="system-select" onchange="updateMapping('${column}', this.value)">
+                        <option value="">-- Select System Field --</option>
+                        <optgroup label="Required Fields">
+                            ${SYSTEM_FIELDS.required.map(field => `
+                                <option value="${field.key}" ${suggestions[column] === field.key ? 'selected' : ''}>
+                                    ${field.name}
+                                </option>
+                            `).join('')}
+                        </optgroup>
+                        <optgroup label="Optional Fields">
+                            ${SYSTEM_FIELDS.optional.map(field => `
+                                <option value="${field.key}" ${suggestions[column] === field.key ? 'selected' : ''}>
+                                    ${field.name}
+                                </option>
+                            `).join('')}
+                        </optgroup>
+                    </select>
+                </div>
+            `).join('');
+
+            // Initialize mappings with suggestions
+            Object.entries(suggestions).forEach(([userCol, systemCol]) => {
+                updateMapping(userCol, systemCol);
+            });
+
+            mappingSection.style.display = 'block';
+            document.getElementById('processSection').style.display = 'block';
+        }
+
+        // Update column mapping
+        function updateMapping(userColumn, systemField) {
+            if (systemField) {
+                columnMappings[userColumn] = systemField;
+                
+                // Update field status
+                const statusElement = document.getElementById(`status-${systemField}`);
+                if (statusElement) {
+                    statusElement.textContent = 'Mapped';
+                    statusElement.className = 'field-status status-mapped';
+                }
+            } else {
+                delete columnMappings[userColumn];
+                
+                // Reset status for all fields that might have been mapped to this user column
+                [...SYSTEM_FIELDS.required, ...SYSTEM_FIELDS.optional].forEach(field => {
+                    const statusElement = document.getElementById(`status-${field.key}`);
+                    if (statusElement && statusElement.textContent === 'Mapped') {
+                        const isMapped = Object.values(columnMappings).includes(field.key);
+                        if (!isMapped) {
+                            const isRequired = SYSTEM_FIELDS.required.some(f => f.key === field.key);
+                            statusElement.textContent = isRequired ? 'Required' : 'Optional';
+                            statusElement.className = `field-status ${isRequired ? 'status-required' : 'status-optional'}`;
+                        }
+                    }
+                });
+            }
+
+            validateMappings();
+        }
+
+        // Validate mappings
+        function validateMappings() {
+            const processBtn = document.getElementById('processBtn');
+            const requiredMapped = SYSTEM_FIELDS.required.every(field => 
+                Object.values(columnMappings).includes(field.key)
+            );
+
+            processBtn.disabled = !requiredMapped;
+            
+            if (requiredMapped) {
+                updateStep(3);
+            }
+        }
+
+        // Process data
+        async function processData() {
+            try {
+                showProcessing();
+
+                const formData = new FormData();
+                formData.append('file', currentFile);
+                formData.append('mappings', JSON.stringify(columnMappings));
+                formData.append('session_id', sessionId);
+
+                const result = await apiCall('/api/process-data', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!result || !result.success) {
+                    throw new Error(result?.message || 'Processing failed');
+                }
+
+                showSuccess(result.stats);
+
+            } catch (error) {
+                console.error('Processing failed:', error);
+                showError(error.message || 'Failed to process data');
+            }
+        }
+
+        // UI State Management
+        function updateStep(step) {
+            [1, 2, 3].forEach(i => {
+                const stepElement = document.getElementById(`step${i}`);
+                stepElement.classList.remove('active', 'completed');
+                
+                if (i < step) {
+                    stepElement.classList.add('completed');
+                } else if (i === step) {
+                    stepElement.classList.add('active');
+                }
+            });
+        }
+
+        function showLoading(message) {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('mappingSection').style.display = 'none';
+            document.getElementById('processSection').style.display = 'none';
+            document.getElementById('successSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'none';
+            
+            const processing = document.getElementById('processingState');
+            processing.querySelector('.processing-subtitle').textContent = message;
+            processing.style.display = 'block';
+        }
+
+        function showProcessing() {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('mappingSection').style.display = 'none';
+            document.getElementById('processSection').style.display = 'none';
+            document.getElementById('successSection').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'none';
+            document.getElementById('processingState').style.display = 'block';
+        }
+
+        function showSuccess(stats) {
+            const successSection = document.getElementById('successSection');
+            const successStats = document.getElementById('successStats');
+
+            successStats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${stats.total_students}</div>
+                    <div class="stat-label">Students Processed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${stats.high_risk_students}</div>
+                    <div class="stat-label">High Risk Students</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${Object.keys(columnMappings).length}</div>
+                    <div class="stat-label">Columns Mapped</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">✓</div>
+                    <div class="stat-label">Data Validated</div>
+                </div>
+            `;
+
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('mappingSection').style.display = 'none';
+            document.getElementById('processSection').style.display = 'none';
+            document.getElementById('processingState').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'none';
+            successSection.style.display = 'block';
+            
+            updateStep(3);
+        }
+
+        function showError(message) {
+            const errorSection = document.getElementById('errorSection');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            errorMessage.textContent = message;
+            
+            document.getElementById('processingState').style.display = 'none';
+            errorSection.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('errorSection').style.display = 'none';
+        }
+
+        // Action functions
+        function changeFile() {
+            document.getElementById('fileInput').click();
+        }
+
+        function uploadAnother() {
+            // Reset everything
+            currentFile = null;
+            fileData = null;
+            columnMappings = {};
+            sessionId = null;
+
+            document.getElementById('successSection').style.display = 'none';
+            document.getElementById('filePreview').style.display = 'none';
+            document.getElementById('mappingSection').style.display = 'none';
+            document.getElementById('processSection').style.display = 'none';
+            document.getElementById('uploadSection').style.display = 'block';
+            
+            updateStep(1);
+        }
+
+        function retryUpload() {
+            hideError();
+            if (currentFile) {
+                uploadFile();
+            } else {
+                uploadAnother();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user_info');
+            window.location.href = '/login';
+        }
+
+        // Multi-file upload functions
+        function showSingleUpload() {
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('multiUploadSection').style.display = 'none';
+            document.getElementById('singleUploadBtn').style.background = 'var(--primary-blue)';
+            document.getElementById('multiUploadBtn').style.background = 'var(--border-color)';
+        }
+
+        function showMultiUpload() {
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('multiUploadSection').style.display = 'block';
+            document.getElementById('singleUploadBtn').style.background = 'var(--border-color)';
+            document.getElementById('multiUploadBtn').style.background = 'var(--rajasthan-orange)';
+            setupMultiFileHandling();
+        }
+
+        function setupMultiFileHandling() {
+            ['attendance', 'marks', 'fees'].forEach(type => {
+                const input = document.getElementById(`${type}Input`);
+                input.addEventListener('change', (e) => {
+                    if (e.target.files.length > 0) {
+                        handleMultiFile(type, e.target.files[0]);
+                    }
+                });
+            });
+        }
+
+        function handleMultiFile(type, file) {
+            multiFiles[type] = file;
+            const status = document.getElementById(`${type}Status`);
+            status.textContent = `✓ ${file.name}`;
+            status.style.color = 'var(--success-green)';
+            
+            // Check if all files are selected
+            const allSelected = Object.values(multiFiles).every(f => f !== null);
+            document.getElementById('multiProcessBtn').disabled = !allSelected;
+            
+            if (allSelected) {
+                document.getElementById('multiProcessBtn').style.background = 'var(--success-green)';
+            }
+        }
+
+        async function processMultiFiles() {
+            try {
+                showLoading('Processing 3 files and merging data...');
+
+                const formData = new FormData();
+                formData.append('attendance_file', multiFiles.attendance);
+                formData.append('marks_file', multiFiles.marks);
+                formData.append('fees_file', multiFiles.fees);
+
+                const result = await apiCall('/api/upload-multi-files', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!result || !result.success) {
+                    throw new Error(result?.message || 'Multi-file processing failed');
+                }
+
+                showMultiFileSuccess(result.summary);
+
+            } catch (error) {
+                console.error('Multi-file processing failed:', error);
+                showError(error.message || 'Failed to process multiple files');
+            }
+        }
+
+        function showMultiFileSuccess(summary) {
+            const successSection = document.getElementById('successSection');
+            const successStats = document.getElementById('successStats');
+
+            successStats.innerHTML = `
+                <div class="stat-item">
+                    <div class="stat-value">${summary.total_students}</div>
+                    <div class="stat-label">Students Merged</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${summary.high_risk_students}</div>
+                    <div class="stat-label">High Risk Students</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">${summary.payment_issues}</div>
+                    <div class="stat-label">Payment Issues</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">3</div>
+                    <div class="stat-label">Files Processed</div>
+                </div>
+            `;
+
+            document.getElementById('multiUploadSection').style.display = 'none';
+            document.getElementById('processingState').style.display = 'none';
+            document.getElementById('errorSection').style.display = 'none';
+            successSection.style.display = 'block';
+            
+            // Update success message for multi-file
+            successSection.querySelector('.success-title').textContent = 'Multi-File Data Merged Successfully!';
+            successSection.querySelector('.success-subtitle').textContent = 'Attendance, marks, and fees data have been merged and analyzed';
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkAuthentication()) {
+                setupFileHandling();
+                showSingleUpload(); // Default to single upload
+            }
+        });
+    </script>
+</body>
+</html>

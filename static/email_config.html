@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Configuration - EduAlert</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f9fafb;
+            margin: 0;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+        .title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1rem;
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+        .input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+        }
+        .btn {
+            background: #1e40af;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            background: #1d4ed8;
+        }
+        .status {
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+        .success {
+            background: #f0fdf4;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+        .error {
+            background: #fef2f2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+        .info {
+            background: #eff6ff;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">📧 Email Configuration</h1>
+        
+        <div class="info">
+            <strong>Setup Instructions:</strong><br>
+            1. Use Gmail account<br>
+            2. Enable 2-factor authentication<br>
+            3. Generate App Password (not regular password)<br>
+            4. Use App Password in the form below
+        </div>
+
+        <div id="status" style="display: none;"></div>
+
+        <form id="emailForm">
+            <div class="form-group">
+                <label class="label">Sender Email (Gmail)</label>
+                <input type="email" class="input" id="senderEmail" placeholder="your-email@gmail.com" required>
+            </div>
+
+            <div class="form-group">
+                <label class="label">App Password (16 characters)</label>
+                <input type="password" class="input" id="senderPassword" placeholder="xxxx xxxx xxxx xxxx" required>
+            </div>
+
+            <div class="form-group">
+                <label class="label">Recipient Email (Mentor)</label>
+                <input type="email" class="input" id="recipientEmail" placeholder="mentor@college.edu" value="mentor@college.edu">
+            </div>
+
+            <button type="submit" class="btn">💾 Save Configuration</button>
+        </form>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="/alerts" style="color: #1e40af; text-decoration: none;">← Back to Alerts</a>
+        </div>
+        
+        <!-- Footer -->
+        <div style="text-align: center; padding: 2rem; color: #6b7280; font-size: 0.875rem; border-top: 1px solid #d1d5db; margin-top: 2rem;">
+            Made with ❤️
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = window.location.origin;
+
+        document.getElementById('emailForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const statusDiv = document.getElementById('status');
+            const senderEmail = document.getElementById('senderEmail').value;
+            const senderPassword = document.getElementById('senderPassword').value;
+            
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`${API_BASE}/api/configure-email`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({
+                        sender_email: senderEmail,
+                        sender_password: senderPassword,
+                        smtp_server: 'smtp.gmail.com',
+                        smtp_port: 587
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ Email configuration saved successfully!';
+                    statusDiv.style.display = 'block';
+                    
+                    setTimeout(() => {
+                        window.location.href = '/alerts';
+                    }, 2000);
+                } else {
+                    throw new Error(result.detail || 'Configuration failed');
+                }
+                
+            } catch (error) {
+                statusDiv.className = 'status error';
+                statusDiv.textContent = `❌ Error: ${error.message}`;
+                statusDiv.style.display = 'block';
+            }
+        });
+
+        // Load current config
+        async function loadConfig() {
+            try {
+                const token = localStorage.getItem('access_token');
+                const response = await fetch(`${API_BASE}/api/email-config`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const config = await response.json();
+                
+                if (config.smtp_configured) {
+                    document.getElementById('senderEmail').value = config.sender_email;
+                    const statusDiv = document.getElementById('status');
+                    statusDiv.className = 'status success';
+                    statusDiv.textContent = '✅ Email already configured and ready!';
+                    statusDiv.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Failed to load config:', error);
+            }
+        }
+
+        loadConfig();
+    </script>
+</body>
+</html>

@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Portal - EduAlert</title>
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --rajasthan-orange: #ea580c;
+            --light-blue: #eff6ff;
+            --success-green: #16a34a;
+            --danger-red: #dc2626;
+            --warning-yellow: #d97706;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #d1d5db;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, #1d4ed8 50%, var(--rajasthan-orange) 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            position: relative;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .login-container {
+            background: var(--bg-primary);
+            border-radius: 1.5rem;
+            box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+            padding: 3rem;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--rajasthan-orange));
+            border-radius: 1.5rem 1.5rem 0 0;
+        }
+
+        .government-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .government-emblem {
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 1.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--rajasthan-orange));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: bold;
+            box-shadow: 0 10px 25px -5px rgb(0 0 0 / 0.1);
+            position: relative;
+        }
+
+        .government-emblem::after {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--rajasthan-orange));
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask-composite: xor;
+            opacity: 0.6;
+        }
+
+        .portal-title {
+            color: var(--text-primary);
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--primary-blue), var(--rajasthan-orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .portal-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+
+        .access-badge {
+            background: linear-gradient(135deg, var(--primary-blue), #1d4ed8);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin: 1rem auto;
+            display: inline-block;
+            box-shadow: var(--shadow-md);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 0.925rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: var(--bg-primary);
+            position: relative;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgb(30 64 175 / 0.1);
+            transform: translateY(-1px);
+        }
+
+        .form-input.error {
+            border-color: var(--danger-red);
+            box-shadow: 0 0 0 4px rgb(220 38 38 / 0.1);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, var(--primary-blue), #1d4ed8);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .login-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px -5px rgb(30 64 175 / 0.3);
+        }
+
+        .login-button:hover::before {
+            left: 100%;
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-button .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffffff3d;
+            border-top: 2px solid #ffffff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 0.75rem;
+        }
+
+        .login-button.loading .spinner {
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: var(--danger-red);
+            padding: 1rem 1.25rem;
+            border-radius: 0.75rem;
+            font-size: 0.925rem;
+            margin-bottom: 1.5rem;
+            display: none;
+            font-weight: 500;
+        }
+
+        .portal-switch {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .switch-label {
+            color: var(--text-secondary);
+            font-size: 0.925rem;
+            margin-bottom: 1rem;
+        }
+
+        .switch-button {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .switch-button:hover {
+            border-color: var(--rajasthan-orange);
+            color: var(--rajasthan-orange);
+            background: #fff7ed;
+        }
+
+        .demo-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .demo-title {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .demo-account {
+            background: var(--bg-secondary);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+
+        .demo-account:hover {
+            background: var(--light-blue);
+            border-color: var(--primary-blue);
+            transform: translateY(-1px);
+        }
+
+        .demo-account-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 0.925rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .demo-account-details {
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 2.5rem;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .security-notice {
+            background: #f0f9ff;
+            border: 1px solid #bae6fd;
+            color: var(--primary-blue);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 2rem 1.5rem;
+                margin: 1rem;
+            }
+            
+            .portal-title {
+                font-size: 1.5rem;
+            }
+            
+            .government-emblem {
+                width: 80px;
+                height: 80px;
+                font-size: 2rem;
+            }
+        }
+
+        /* Animation for page load */
+        .login-container {
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="government-header">
+            <div class="government-emblem">🏛️</div>
+            <h1 class="portal-title">Government Portal</h1>
+            <p class="portal-subtitle">EduAlert System<br>Government of Rajasthan</p>
+            <div class="access-badge">Administrative Access</div>
+        </div>
+
+        <div class="security-notice">
+            🔒 This portal is restricted to authorized government personnel only
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="username">Government Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    class="form-input" 
+                    placeholder="Enter your government username"
+                    required
+                    autocomplete="username"
+                >
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="password">Secure Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    class="form-input" 
+                    placeholder="Enter your secure password"
+                    required
+                    autocomplete="current-password"
+                >
+            </div>
+
+            <button type="submit" class="login-button" id="loginButton">
+                <div class="spinner"></div>
+                <span id="buttonText">Access Government Portal</span>
+            </button>
+        </form>
+
+        <div class="demo-section">
+            <div class="demo-title">Demo Account (Development Only)</div>
+            
+            <div class="demo-account" onclick="fillDemoCredentials('government_admin', 'admin123')">
+                <div class="demo-account-title">Government Administrator</div>
+                <div class="demo-account-details">Full system access • All colleges monitoring</div>
+            </div>
+        </div>
+
+        <div class="portal-switch">
+            <div class="switch-label">Accessing from a college?</div>
+            <a href="/login-college" class="switch-button">College Portal →</a>
+        </div>
+
+        <div class="footer">
+            Made with ❤️<br>
+            <strong>Authorized Personnel Only</strong>
+        </div>
+    </div>
+
+    <script>
+        // API Configuration
+        const API_BASE = window.location.origin;
+
+        // DOM Elements
+        const loginForm = document.getElementById('loginForm');
+        const loginButton = document.getElementById('loginButton');
+        const buttonText = document.getElementById('buttonText');
+        const errorMessage = document.getElementById('errorMessage');
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+
+        // Event Listeners
+        loginForm.addEventListener('submit', handleLogin);
+        
+        // Handle form submission
+        async function handleLogin(e) {
+            e.preventDefault();
+            
+            const username = usernameInput.value.trim();
+            const password = passwordInput.value.trim();
+            
+            if (!username || !password) {
+                showError('Please enter both username and password.');
+                return;
+            }
+
+            setLoading(true);
+            hideError();
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.detail || 'Login failed');
+                }
+
+                // Verify this is a government account
+                if (data.user_info.role !== 'government_admin') {
+                    throw new Error('Access denied. This portal is for government users only.');
+                }
+
+                // Store authentication data
+                localStorage.setItem('access_token', data.access_token);
+                localStorage.setItem('user_info', JSON.stringify(data.user_info));
+
+                // Redirect to unified dashboard
+                window.location.href = '/dashboard';
+
+            } catch (error) {
+                console.error('Login error:', error);
+                showError(error.message || 'Login failed. Please verify your credentials.');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        // Fill demo credentials
+        function fillDemoCredentials(username, password) {
+            usernameInput.value = username;
+            passwordInput.value = password;
+            hideError();
+        }
+
+        // Set loading state
+        function setLoading(loading) {
+            loginButton.disabled = loading;
+            loginButton.classList.toggle('loading', loading);
+            buttonText.textContent = loading ? 'Authenticating...' : 'Access Government Portal';
+        }
+
+        // Show error message
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            
+            // Add error styling to inputs
+            usernameInput.classList.add('error');
+            passwordInput.classList.add('error');
+            
+            // Remove error styling after 3 seconds
+            setTimeout(() => {
+                usernameInput.classList.remove('error');
+                passwordInput.classList.remove('error');
+            }, 3000);
+        }
+
+        // Hide error message
+        function hideError() {
+            errorMessage.style.display = 'none';
+            usernameInput.classList.remove('error');
+            passwordInput.classList.remove('error');
+        }
+
+        // Check if user is already logged in
+        function checkExistingAuth() {
+            const token = localStorage.getItem('access_token');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (token && userInfo) {
+                try {
+                    const user = JSON.parse(userInfo);
+                    if (user.role === 'government_admin') {
+                        // Verify token is still valid
+                        fetch(`${API_BASE}/auth/me`, {
+                            headers: {
+                                'Authorization': `Bearer ${token}`
+                            }
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                window.location.href = '/dashboard';
+                            } else {
+                                // Token expired, clear storage
+                                localStorage.removeItem('access_token');
+                                localStorage.removeItem('user_info');
+                            }
+                        })
+                        .catch(() => {
+                            // Network error or invalid token
+                            localStorage.removeItem('access_token');
+                            localStorage.removeItem('user_info');
+                        });
+                    }
+                } catch (e) {
+                    // Invalid stored data
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('user_info');
+                }
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            checkExistingAuth();
+            
+            // Focus on username input
+            usernameInput.focus();
+            
+            // Handle Enter key in inputs
+            usernameInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    passwordInput.focus();
+                }
+            });
+            
+            passwordInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    loginForm.dispatchEvent(new Event('submit'));
+                }
+            });
+        });
+
+        // Handle browser back button
+        window.addEventListener('pageshow', (e) => {
+            if (e.persisted) {
+                checkExistingAuth();
+            }
+        });
+    </script>
+</body>
+</html>

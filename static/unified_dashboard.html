@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - EduAlert</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        :root {
+            --primary-blue: #1e40af;
+            --rajasthan-orange: #ea580c;
+            --light-blue: #eff6ff;
+            --success-green: #16a34a;
+            --danger-red: #dc2626;
+            --warning-yellow: #d97706;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #d1d5db;
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.5;
+            overflow-x: hidden;
+            overflow-y: auto;
+            height: 100vh;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--bg-primary);
+            border-bottom: 2px solid var(--primary-blue);
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .logo-text .logo-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .logo-text .logo-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .nav-center {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        /* College Selector - Only visible for government users */
+        .college-selector {
+            display: none;
+            align-items: center;
+            gap: 1rem;
+            background: var(--bg-secondary);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--border-color);
+        }
+
+        .college-selector.government {
+            display: flex;
+        }
+
+        .selector-label {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .college-select {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            background: white;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            min-width: 250px;
+        }
+
+        .college-select:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgb(30 64 175 / 0.1);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.25rem;
+        }
+
+        .user-name {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .user-role {
+            background: var(--light-blue);
+            color: var(--primary-blue);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .user-role.government {
+            background: linear-gradient(135deg, var(--primary-blue), #1d4ed8);
+            color: white;
+        }
+
+        .logout-btn {
+            background: var(--danger-red);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.375rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .logout-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+        }
+
+        .nav-menu-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-item {
+            padding: 1rem 0;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-item:hover,
+        .nav-item.active {
+            color: var(--primary-blue);
+            border-bottom-color: var(--primary-blue);
+        }
+
+        .nav-icon {
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            min-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-top: 0.25rem;
+        }
+
+        .current-view {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .view-label {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .view-value {
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.125rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--primary-blue);
+        }
+
+        .stat-card.danger::before {
+            background: var(--danger-red);
+        }
+
+        .stat-card.warning::before {
+            background: var(--warning-yellow);
+        }
+
+        .stat-card.success::before {
+            background: var(--success-green);
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .stat-title {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .stat-icon {
+            width: 3rem;
+            height: 3rem;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-description {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+        }
+
+        /* Charts and Content */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .chart-card {
+            background: var(--bg-primary);
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+
+        .chart-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .chart-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .chart-subtitle {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        /* Quick Actions */
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            background: var(--bg-primary);
+            border: 2px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            border-color: var(--primary-blue);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .action-icon {
+            font-size: 1.25rem;
+        }
+
+        /* Loading States */
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 2px solid var(--border-color);
+            border-top: 2px solid var(--primary-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-container,
+            .nav-menu-container,
+            .main-container {
+                padding: 1rem;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-center {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .college-selector {
+                flex-direction: column;
+                gap: 0.5rem;
+                align-items: flex-start;
+            }
+            
+            .college-select {
+                min-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="logo-section">
+                <div class="logo">
+                    <img src="/static/logo.jpg" alt="EduAlert Logo">
+                </div>
+                <div class="logo-text">
+                    <div class="logo-title">EduAlert</div>
+                    <div class="logo-subtitle">Student Analytics</div>
+                </div>
+            </div>
+            
+            <!-- College Selector (Government Users Only) -->
+            <div class="nav-center">
+                <div class="college-selector" id="collegeSelector">
+                    <span class="selector-label">Viewing College:</span>
+                    <select class="college-select" id="collegeSelect" onchange="changeCollege()">
+                        <option value="all">All Colleges (Combined)</option>
+                        <option value="gpj">Government Polytechnic Jaipur</option>
+                        <option value="geca">Government Engineering College Ajmer</option>
+                        <option value="rtu">Rajasthan Technical University Kota</option>
+                        <option value="itij">Industrial Training Institute Jaipur</option>
+                        <option value="polu">Polytechnic College Udaipur</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="nav-actions">
+                <div class="user-info">
+                    <span class="user-name" id="userName">Loading...</span>
+                    <span class="user-role" id="userRole">USER</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation Menu -->
+    <nav class="nav-menu">
+        <div class="nav-menu-container">
+            <a href="/dashboard" class="nav-item active">
+                <span class="nav-icon">📊</span>
+                Dashboard
+            </a>
+            <a href="/students" class="nav-item">
+                <span class="nav-icon">👥</span>
+                Students
+            </a>
+            <a href="/alerts" class="nav-item">
+                <span class="nav-icon">🚨</span>
+                Alerts
+            </a>
+            <a href="/upload" class="nav-item" id="uploadNav">
+                <span class="nav-icon">📤</span>
+                Upload Data
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main-container">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+                <p class="page-subtitle">Student dropout risk monitoring and analysis</p>
+            </div>
+            
+            <div class="current-view">
+                <div class="view-label">Current View</div>
+                <div class="view-value" id="currentView">Loading...</div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions" id="quickActions">
+            <!-- Actions will be populated based on user role -->
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <div class="spinner"></div>
+            <span>Loading dashboard data...</span>
+        </div>
+
+        <!-- Dashboard Content -->
+        <div id="dashboardContent" style="display: none;">
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-header">
+                        <span class="stat-title">Total Students</span>
+                        <div class="stat-icon" style="background: var(--light-blue); color: var(--primary-blue);">👥</div>
+                    </div>
+                    <div class="stat-value" id="totalStudents">0</div>
+                    <div class="stat-description" id="totalStudentsDesc">Active students</div>
+                </div>
+
+                <div class="stat-card danger">
+                    <div class="stat-header">
+                        <span class="stat-title">High Risk Students</span>
+                        <div class="stat-icon" style="background: #fee2e2; color: var(--danger-red);">⚠️</div>
+                    </div>
+                    <div class="stat-value" id="highRiskStudents">0</div>
+                    <div class="stat-description" id="riskPercentage">0% of total</div>
+                </div>
+
+                <div class="stat-card warning">
+                    <div class="stat-header">
+                        <span class="stat-title">Active Alerts</span>
+                        <div class="stat-icon" style="background: #fef3c7; color: var(--warning-yellow);">🔔</div>
+                    </div>
+                    <div class="stat-value" id="activeAlerts">0</div>
+                    <div class="stat-description">Requiring attention</div>
+                </div>
+
+                <div class="stat-card success">
+                    <div class="stat-header">
+                        <span class="stat-title">Interventions</span>
+                        <div class="stat-icon" style="background: #dcfce7; color: var(--success-green);">✅</div>
+                    </div>
+                    <div class="stat-value" id="interventions">0</div>
+                    <div class="stat-description">This month</div>
+                </div>
+            </div>
+
+            <!-- Content Grid -->
+            <div class="content-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Risk Distribution</h3>
+                        <p class="chart-subtitle">Students categorized by dropout risk level</p>
+                    </div>
+                    <div style="position: relative; height: 300px;">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <h3 class="chart-title">Recent Activities</h3>
+                        <p class="chart-subtitle">Latest system activities</p>
+                    </div>
+                    <div id="recentActivities">
+                        <!-- Activities will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.875rem; border-top: 1px solid var(--border-color); margin-top: 2rem;">
+        Made with ❤️
+    </footer>
+
+    <script>
+        // Configuration
+        const API_BASE = window.location.origin;
+        let currentUser = null;
+        let selectedCollege = 'all';
+        let dashboardData = null;
+        let chart = null;
+
+        // Authentication check and user setup
+        function checkAuthentication() {
+            const token = localStorage.getItem('access_token');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (!token || !userInfo) {
+                window.location.href = '/login-government';
+                return false;
+            }
+            
+            try {
+                currentUser = JSON.parse(userInfo);
+                setupUserInterface();
+                return true;
+            } catch (e) {
+                logout();
+                return false;
+            }
+        }
+
+        // Setup UI based on user role
+        function setupUserInterface() {
+            const userName = document.getElementById('userName');
+            const userRole = document.getElementById('userRole');
+            const collegeSelector = document.getElementById('collegeSelector');
+            const quickActions = document.getElementById('quickActions');
+            const uploadNav = document.getElementById('uploadNav');
+
+            userName.textContent = currentUser.username;
+            
+            if (currentUser.role === 'government_admin') {
+                userRole.textContent = 'Government Admin';
+                userRole.classList.add('government');
+                collegeSelector.classList.add('government');
+                
+                // Government can see all colleges
+                selectedCollege = 'all';
+                document.getElementById('collegeSelect').value = 'all';
+                
+                // Government quick actions
+                quickActions.innerHTML = `
+                    <a href="/students" class="action-btn">
+                        <span class="action-icon">👥</span>
+                        <div>View All Students<br><small>Across all colleges</small></div>
+                    </a>
+                    <a href="/alerts" class="action-btn">
+                        <span class="action-icon">🚨</span>
+                        <div>Critical Alerts<br><small>Immediate attention</small></div>
+                    </a>
+                    <a href="/upload" class="action-btn">
+                        <span class="action-icon">📤</span>
+                        <div>Data Management<br><small>Upload & manage</small></div>
+                    </a>
+                `;
+            } else {
+                userRole.textContent = 'College Admin';
+                
+                // College users see only their college
+                selectedCollege = currentUser.college_id;
+                collegeSelector.style.display = 'none';
+                
+                // Hide upload for college users (optional)
+                uploadNav.style.display = 'none';
+                
+                // College quick actions
+                quickActions.innerHTML = `
+                    <a href="/students" class="action-btn">
+                        <span class="action-icon">👥</span>
+                        <div>College Students<br><small>Manage your students</small></div>
+                    </a>
+                    <a href="/alerts" class="action-btn">
+                        <span class="action-icon">🚨</span>
+                        <div>College Alerts<br><small>Your college alerts</small></div>
+                    </a>
+                    <a href="/upload" class="action-btn">
+                        <span class="action-icon">📤</span>
+                        <div>Upload Data<br><small>Add student data</small></div>
+                    </a>
+                `;
+            }
+            
+            updateCurrentView();
+        }
+
+        // Update current view display
+        function updateCurrentView() {
+            const currentView = document.getElementById('currentView');
+            
+            if (currentUser.role === 'government_admin') {
+                if (selectedCollege === 'all') {
+                    currentView.textContent = 'All Colleges (Combined View)';
+                } else {
+                    currentView.textContent = getCollegeName(selectedCollege);
+                }
+            } else {
+                currentView.textContent = getCollegeName(currentUser.college_id);
+            }
+        }
+
+        // Change college (government users only)
+        function changeCollege() {
+            if (currentUser.role !== 'government_admin') return;
+            
+            selectedCollege = document.getElementById('collegeSelect').value;
+            updateCurrentView();
+            loadDashboard();
+        }
+
+        // API call with authentication
+        async function apiCall(endpoint, options = {}) {
+            const token = localStorage.getItem('access_token');
+            const defaultOptions = {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    ...options.headers
+                }
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}${endpoint}`, {
+                    ...options,
+                    headers: defaultOptions.headers
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return null;
+                }
+
+                if (!response.ok) {
+                    console.error(`API Error: ${response.status} - ${response.statusText}`);
+                    throw new Error(`API Error: ${response.status}`);
+                }
+
+                return await response.json();
+            } catch (error) {
+                console.error('API call failed:', error);
+                // Return null to trigger mock data
+                return null;
+            }
+        }
+
+        // Load dashboard data
+        async function loadDashboard() {
+            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('dashboardContent').style.display = 'none';
+
+            try {
+                // Build API endpoint based on user role and selected college
+                let endpoint = '/api/dashboard/stats';
+                if (currentUser.role !== 'government_admin') {
+                    // College users automatically get their college data
+                    endpoint = `/api/dashboard/stats`;
+                } else if (selectedCollege !== 'all') {
+                    // Government user viewing specific college
+                    endpoint = `/api/dashboard/stats?college=${selectedCollege}`;
+                }
+
+                dashboardData = await apiCall(endpoint);
+                
+                if (!dashboardData) {
+                    throw new Error('No data received from server');
+                }
+                
+                // Load alerts data
+                const alertsData = await apiCall('/api/dashboard/alerts');
+                if (alertsData) {
+                    dashboardData.alerts = alertsData;
+                }
+
+                updateDashboardContent();
+                
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+
+            } catch (error) {
+                console.error('Failed to load dashboard:', error);
+                // Show error and use mock data
+                console.log('Using mock data due to API failure');
+                showMockDataForSelection();
+            }
+        }
+
+        // Update dashboard content
+        function updateDashboardContent() {
+            const overview = dashboardData.overview || {};
+            const riskDist = dashboardData.risk_distribution || {};
+            const alerts = dashboardData.alerts || {};
+            
+            // Calculate high risk students from risk distribution if not provided
+            let highRiskCount = overview.high_risk_students || 0;
+            if (highRiskCount === 0 && Object.keys(riskDist).length > 0) {
+                highRiskCount = (riskDist['High'] || 0) + (riskDist['Critical'] || 0) + 
+                               (riskDist['high'] || 0) + (riskDist['critical'] || 0);
+            }
+            
+            // Active alerts should equal high risk students
+            let alertsCount = highRiskCount;
+            
+            document.getElementById('totalStudents').textContent = overview.total_students || 0;
+            document.getElementById('highRiskStudents').textContent = highRiskCount;
+            document.getElementById('activeAlerts').textContent = highRiskCount;
+            document.getElementById('interventions').textContent = Math.floor(alertsCount * 0.6);
+            
+            const riskPercentage = overview.total_students > 0 ? 
+                (highRiskCount / overview.total_students * 100).toFixed(1) : 0;
+            document.getElementById('riskPercentage').textContent = `${riskPercentage}% of total`;
+            
+            if (currentUser.role === 'government_admin') {
+                if (selectedCollege === 'all') {
+                    document.getElementById('totalStudentsDesc').textContent = 'Across all colleges';
+                } else {
+                    document.getElementById('totalStudentsDesc').textContent = `At ${getCollegeName(selectedCollege)}`;
+                }
+            } else {
+                document.getElementById('totalStudentsDesc').textContent = 'In your college';
+            }
+            
+            updateRiskChart();
+            updateRecentActivities();
+        }
+
+        // Get chart colors based on risk levels
+        function getChartColors(labels) {
+            const colorMap = {
+                'Low': '#16a34a',      // Green
+                'Medium': '#d97706',   // Orange  
+                'High': '#dc2626',     // Red
+                'Critical': '#991b1b', // Dark Red
+                'low': '#16a34a',
+                'medium': '#d97706',
+                'high': '#dc2626',
+                'critical': '#991b1b'
+            };
+            
+            return labels.map(label => colorMap[label] || '#6b7280');
+        }
+
+        // Update risk chart
+        function updateRiskChart() {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            const riskData = dashboardData.risk_distribution || {};
+            
+            // Ensure we have data to display
+            if (Object.keys(riskData).length === 0) {
+                riskData['Low'] = 1;
+                riskData['No Data'] = 0;
+            }
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            chart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(riskData),
+                    datasets: [{
+                        data: Object.values(riskData),
+                        backgroundColor: getChartColors(Object.keys(riskData)),
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.parsed || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = total > 0 ? ((value / total) * 100).toFixed(1) : 0;
+                                    return `${label}: ${value} students (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update recent activities
+        function updateRecentActivities() {
+            const activities = document.getElementById('recentActivities');
+            const mockActivities = [
+                'New student data uploaded',
+                'Risk assessment completed',
+                'Alert generated for high-risk students',
+                'Monthly report generated',
+                'System backup completed'
+            ];
+
+            activities.innerHTML = mockActivities.map(activity => `
+                <div style="padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);">
+                    <div style="font-weight: 500; font-size: 0.875rem; color: var(--text-primary);">${activity}</div>
+                    <div style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 0.25rem;">${new Date().toLocaleDateString()}</div>
+                </div>
+            `).join('');
+        }
+
+        // Show mock data based on college selection
+        function showMockDataForSelection() {
+            const collegeData = {
+                'all': {
+                    total_students: 1250,
+                    high_risk_students: 89,
+                    risk_distribution: { 'Low': 650, 'Medium': 320, 'High': 191, 'Critical': 89 }
+                },
+                'gpj': {
+                    total_students: 400,
+                    high_risk_students: 35,
+                    risk_distribution: { 'Low': 200, 'Medium': 120, 'High': 45, 'Critical': 35 }
+                },
+                'geca': {
+                    total_students: 300,
+                    high_risk_students: 18,
+                    risk_distribution: { 'Low': 180, 'Medium': 85, 'High': 17, 'Critical': 18 }
+                },
+                'rtu': {
+                    total_students: 250,
+                    high_risk_students: 15,
+                    risk_distribution: { 'Low': 150, 'Medium': 70, 'High': 15, 'Critical': 15 }
+                },
+                'itij': {
+                    total_students: 150,
+                    high_risk_students: 8,
+                    risk_distribution: { 'Low': 90, 'Medium': 45, 'High': 7, 'Critical': 8 }
+                },
+                'polu': {
+                    total_students: 150,
+                    high_risk_students: 13,
+                    risk_distribution: { 'Low': 80, 'Medium': 44, 'High': 13, 'Critical': 13 }
+                }
+            };
+            
+            const data = collegeData[selectedCollege] || collegeData['all'];
+            
+            dashboardData = {
+                overview: {
+                    total_students: data.total_students,
+                    high_risk_students: data.high_risk_students
+                },
+                risk_distribution: data.risk_distribution,
+                alerts: {
+                    total: data.high_risk_students,
+                    critical_count: data.risk_distribution['Critical'] || 0,
+                    high_count: data.risk_distribution['High'] || 0
+                }
+            };
+            
+            updateDashboardContent();
+            
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('dashboardContent').style.display = 'block';
+        }
+
+        // Utility functions
+        function getCollegeName(collegeId) {
+            const collegeNames = {
+                'gpj': 'Government Polytechnic Jaipur',
+                'geca': 'Government Engineering College Ajmer',
+                'rtu': 'Rajasthan Technical University Kota',
+                'itij': 'Industrial Training Institute Jaipur',
+                'polu': 'Polytechnic College Udaipur'
+            };
+            return collegeNames[collegeId] || collegeId.toUpperCase();
+        }
+
+        function logout() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('user_info');
+            const user = JSON.parse(localStorage.getItem('user_info') || '{}');
+            if (user.role === 'government_admin') {
+                window.location.href = '/login-government';
+            } else {
+                window.location.href = '/login-college';
+            }
+        }
+
+        // Auto refresh dashboard
+        function startAutoRefresh() {
+            setInterval(() => {
+                if (document.visibilityState === 'visible') {
+                    loadDashboard();
+                }
+            }, 60000); // Refresh every minute
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            if (checkAuthentication()) {
+                loadDashboard();
+                startAutoRefresh();
+            }
+        });
+
+        // Handle browser visibility change
+        document.addEventListener('visibilitychange', () => {
+            if (document.visibilityState === 'visible') {
+                loadDashboard();
+            }
+        });
+    </script>
+</body>
+</html>
