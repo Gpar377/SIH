@@ -1,13 +1,14 @@
 {
-  "functions": {
-    "api/index.py": {
-      "includeFiles": "static/**"
+  "builds": [
+    {
+      "src": "backend/main.py",
+      "use": "@vercel/python"
     }
-  },
+  ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/index.py"
+      "dest": "backend/main.py"
     }
   ]
 }
