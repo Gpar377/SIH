@@ -18,11 +18,12 @@ from api.dashboard import dashboard_router
 from api.multi_upload import multi_upload_router
 from api.multi_file_upload import router as multi_file_router
 from api.auth_routes import router as auth_router
+from api.email_alerts import email_router
 
 app = FastAPI(
-    title="DTE Rajasthan Multi-Tenant Dropout Prediction System", 
+    title="EduAlert - Student Dropout Prediction System", 
     version="2.0.0",
-    description="Secure multi-tenant system with role-based access control"
+    description="AI-powered multi-tenant system for early intervention and student success"
 )
 
 # CORS middleware with specific origins
@@ -47,9 +48,6 @@ file_processor = FileProcessor()
 
 # Mount static files
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/css", StaticFiles(directory="../frontend/css"), name="css")
-app.mount("/js", StaticFiles(directory="../frontend/js"), name="js")
-app.mount("/frontend", StaticFiles(directory="../frontend"), name="frontend")
 
 # Include routers
 app.include_router(auth_router, prefix="/auth", tags=["authentication"])
@@ -58,6 +56,7 @@ app.include_router(students_router, prefix="/api")
 app.include_router(dashboard_router, prefix="/api")
 app.include_router(multi_upload_router, prefix="/api")
 app.include_router(multi_file_router, prefix="/api", tags=["multi-file-upload"])
+app.include_router(email_router, prefix="/api", tags=["email-alerts"])
 
 @app.get("/")
 async def serve_frontend():
@@ -87,6 +86,10 @@ async def serve_students():
 async def serve_alerts():
     return FileResponse("static/alerts_interface.html")
 
+@app.get("/email-config")
+async def serve_email_config():
+    return FileResponse("static/email_config.html")
+
 @app.get("/multi-upload")
 async def serve_multi_upload():
     return FileResponse("../frontend/multi_upload.html")
@@ -115,7 +118,7 @@ async def serve_student():
 async def health_check():
     return {
         "status": "healthy", 
-        "message": "DTE Rajasthan Multi-Tenant System Running",
+        "message": "EduAlert Multi-Tenant System Running",
         "version": "2.0.0",
         "features": ["multi-tenancy", "role-based-access", "audit-logging"],
         "security": ["jwt-auth", "cors-protection", "data-isolation"]

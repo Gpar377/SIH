@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student Alerts - DTE Rajasthan</title>
+    <title>Student Alerts - EduAlert</title>
     <style>
         :root {
             --primary-blue: #1e40af;
@@ -63,14 +63,17 @@
         .logo {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--rajasthan-orange));
             border-radius: 50%;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .logo-text .logo-title {
@@ -570,9 +573,11 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo-section">
-                <div class="logo">DTE</div>
+                <div class="logo">
+                    <img src="/static/logo.jpg" alt="EduAlert Logo">
+                </div>
                 <div class="logo-text">
-                    <div class="logo-title">DTE Rajasthan</div>
+                    <div class="logo-title">EduAlert</div>
                     <div class="logo-subtitle">Student Alerts</div>
                 </div>
             </div>
@@ -715,6 +720,11 @@
             <p class="empty-message">Great news! There are no active alerts matching your criteria.</p>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.875rem; border-top: 1px solid var(--border-color); margin-top: 2rem;">
+        Made with ❤️
+    </footer>
 
     <script>
         // Configuration
@@ -913,8 +923,8 @@
                         </div>
                         <div class="alert-actions">
                             <button class="action-btn primary" onclick="viewStudent('${alert.student_id}')">View Student</button>
+                            <button class="action-btn" onclick="sendMentorAlert('${alert.student_id}', '${alert.student_name}')">📧 Alert Mentor</button>
                             <button class="action-btn" onclick="contactStudent('${alert.student_id}')">Contact</button>
-                            <button class="action-btn" onclick="scheduleIntervention('${alert.id}')">Schedule Intervention</button>
                             <button class="action-btn danger" onclick="resolveAlert('${alert.id}')">Mark Resolved</button>
                         </div>
                     </div>
@@ -1008,6 +1018,27 @@
 
         function scheduleIntervention(alertId) {
             alert(`Scheduling intervention for alert ${alertId}`);
+        }
+
+        async function sendMentorAlert(studentId, studentName) {
+            try {
+                const response = await apiCall('/api/send-alert', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        student_id: studentId,
+                        recipient_email: 'mentor@college.edu'
+                    })
+                });
+                
+                if (response && response.success) {
+                    alert(`✅ Alert sent successfully!\n\nStudent: ${studentName}\nSent to: ${response.message.split(' to ')[1]}\nTime: ${new Date().toLocaleString()}`);
+                } else {
+                    throw new Error('Failed to send alert');
+                }
+            } catch (error) {
+                console.error('Email alert failed:', error);
+                alert('❌ Failed to send alert. Please try again.');
+            }
         }
 
         function resolveAlert(alertId) {

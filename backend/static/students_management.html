@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Students Management - DTE Rajasthan</title>
+    <title>Students Management - EduAlert</title>
     <style>
         :root {
             --primary-blue: #1e40af;
@@ -66,14 +66,17 @@
         .logo {
             width: 50px;
             height: 50px;
-            background: linear-gradient(135deg, var(--primary-blue), var(--rajasthan-orange));
             border-radius: 50%;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.2rem;
+        }
+        
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .logo-text .logo-title {
@@ -637,9 +640,11 @@
     <nav class="navbar">
         <div class="navbar-container">
             <div class="logo-section">
-                <div class="logo">DTE</div>
+                <div class="logo">
+                    <img src="/static/logo.jpg" alt="EduAlert Logo">
+                </div>
                 <div class="logo-text">
-                    <div class="logo-title">DTE Rajasthan</div>
+                    <div class="logo-title">EduAlert</div>
                     <div class="logo-subtitle">Students Management</div>
                 </div>
             </div>
@@ -836,6 +841,11 @@
             </form>
         </div>
     </div>
+
+    <!-- Footer -->
+    <footer style="text-align: center; padding: 2rem; color: var(--text-secondary); font-size: 0.875rem; border-top: 1px solid var(--border-color); margin-top: 2rem;">
+        Made with ❤️
+    </footer>
 
     <script>
         // Configuration
