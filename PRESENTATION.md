@@ -458,4 +458,4 @@ Phase 3: State-wide deployment, 500,000+ students
 ---
 
 *Built with ❤️ for the future of education in Rajasthan*  
-*SIH 2024 - Smart India Hackathon*
+*SIH 2025 - Smart India Hackathon*
