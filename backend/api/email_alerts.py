@@ -12,7 +12,7 @@ email_router = APIRouter()
 
 class EmailAlert(BaseModel):
     student_id: str
-    recipient_email: str = "mentor@college.edu"
+    recipient_email: str = "gopaparthiv@gmail.com"
 
 class EmailConfig(BaseModel):
     sender_email: str
@@ -20,13 +20,22 @@ class EmailConfig(BaseModel):
     smtp_server: str = "smtp.gmail.com"
     smtp_port: int = 587
 
-# Email configuration - Update with your credentials
-EMAIL_CONFIG = {
-    "sender_email": "your-email@gmail.com",  # Replace with your email
-    "sender_password": "your-app-password",   # Replace with your app password
-    "smtp_server": "smtp.gmail.com",
-    "smtp_port": 587
-}
+# Email configuration - Use environment variables for security
+try:
+    EMAIL_CONFIG = {
+        "sender_email": os.getenv("SENDER_EMAIL", "projectsih85@gmail.com"),
+        "sender_password": os.getenv("SENDER_PASSWORD", "jydfpidajkkaznoi"),
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": int(os.getenv("SMTP_PORT", "587"))
+    }
+except (ValueError, TypeError) as e:
+    EMAIL_CONFIG = {
+        "sender_email": "demo@example.com",
+        "sender_password": "demo_password",
+        "smtp_server": "smtp.gmail.com",
+        "smtp_port": 587
+    }
+    print(f"Email config error: {e}. Using demo configuration.")
 
 @email_router.post("/send-alert")
 async def send_mentor_alert(alert: EmailAlert):
@@ -57,16 +66,13 @@ async def send_mentor_alert(alert: EmailAlert):
             risk_level = "Critical"
             risk_score = 87.3
         else:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            
-            cursor.execute("""
-                SELECT name, department, semester, attendance_percentage, marks, risk_level, risk_score
-                FROM students WHERE student_id = ?
-            """, (alert.student_id,))
-            
-            student = cursor.fetchone()
-            conn.close()
+            with sqlite3.connect(db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT name, department, semester, attendance_percentage, marks, risk_level, risk_score
+                    FROM students WHERE student_id = ?
+                """, (alert.student_id,))
+                student = cursor.fetchone()
             
             if not student:
                 # Use mock data if student not found
@@ -180,7 +186,7 @@ def send_email(recipient_email: str, subject: str, body: str):
         raise e
 
 @email_router.post("/configure-email")
-async def configure_email(config: EmailConfig):
+async def configure_email(config: EmailConfig, current_user: User = Depends(get_current_user)):
     """Configure email settings"""
     global EMAIL_CONFIG
     EMAIL_CONFIG.update({
